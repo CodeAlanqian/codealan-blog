@@ -1,0 +1,749 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+\usepackage{ctex}
+\usepackage{anyfontsize}
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+% \usepackage{fancyvrb}
+\usepackage[dvipnames]{xcolor}  % 用到了 \color 命令
+\usepackage{listings}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+
+
+\lstdefinestyle{MatlabStyle}{
+    language=Matlab,
+    backgroundcolor=\color{gray!5},        % 浅灰背景
+    basicstyle=\small,            % 小号字体
+    keywordstyle=\color{blue}\bfseries,    % 关键词蓝色加粗
+    commentstyle=\color{green!50!black}\itshape,  % 注释绿色斜体
+    stringstyle=\color{orange!90!black},   % 字符串橙色
+    numberstyle=\tiny\color{gray},         % 行号灰色
+    numbers=left,                          % 左侧行号
+    stepnumber=1,                          % 每行编号
+    frame=single,                          % 单线框
+    rulecolor=\color{gray!40},             % 框线颜色
+    showstringspaces=false,                % 不标记字符串中的空格
+    breaklines=true,                       % 自动换行
+    captionpos=b,                          % 标题在下方
+    tabsize=4,                             % Tab 宽度
+    morekeywords={zeros,ones,plot,hold,on,off,if,end,for,while,elseif,else,pi,log,sqrt,sum,cos,floor,yline}, % 增补关键词
+}
+
+\usepackage{float}
+
+\title{Report: Assignment 2 of Advanced Numerical Analysis}
+\author{龚易乾 12540026}
+
+\begin{document}
+\maketitle
+
+% \begin{abstract}
+% Your abstract.
+% \end{abstract}
+
+\section{Question1}
+Use Guassian elimination with partial pivoting to solve the following linear system. (Use four-digit rounding arthmetic)
+
+$$\begin{gathered}
+x_{1}+20x_{2}-x_{3}+0.001x_{4}=0 \\
+2x_{1}-5x_{2}+30x_{3}-0.1x_{4}=1 \\
+5x_{1}+x_{2}-100x_{3}-10x_{4}=0 \\
+2x_{1}-100x_{2}-x_{3}+x_{4}=0
+\end{gathered}$$
+
+First, 
+$$
+A = \begin{bmatrix}
+1 & 20 & -1 & 0.001 \\
+2 & -5 & 30 & -0.1 \\
+5 & 1 & -100 & -10 \\
+2 & -100 & -1 & 1
+\end{bmatrix}
+\qquad
+b =\begin{bmatrix}
+0 \\
+1 \\
+0 \\
+0
+\end{bmatrix}
+$$
+Then, we write the augmented matrix of the system:
+$$[A|b] = \begin{bmatrix}
+1 & 20 & -1 & 0.001 & 0 \\
+2 & -5 & 30 & -0.1 & 1 \\
+5 & 1 & -100 & -10 & 0 \\
+2 & -100 & -1 & 1 & 0
+\end{bmatrix}$$
+
+\begin{lstlisting}[style=MatlabStyle]
+%% Define A and b
+A = [1, 20, -1, 0.001;
+     2, -5, 30, -0.1;
+     5, 1, -100, -10;
+     2, -100, -1, 1; ];
+b = [0;1;0;0];
+\end{lstlisting}
+
+The Steps of Gaussian elimination with partial pivoting are as follows:
+1. For each column, find the maximum element in the current column from the current row to the last row.
+
+2. Swap the current row with the row containing the maximum element.
+
+3. Perform elimination below the current row.
+
+\begin{lstlisting}[style=MatlabStyle]
+%% function
+function x = Guass_elimination_pivot(A, b)
+Ab = [A b]; % Augmented matrix
+N = size(Ab,1); % get the size of matrix (row)
+for p=1:N-1
+    temp = Ab(p,p);
+    idx = p; % find the biggest abs value of this column
+    for r=p+1:N
+        if abs(Ab(r,p)) > temp
+            idx = r;
+            temp = Ab(r,p);
+        end
+    end
+
+    % exchage row p and row r
+    AA = Ab(p,p:N+1); % store the origin value
+    Ab(p,p:N+1) = Ab(idx,p:N+1);
+    Ab(idx,p:N+1) = AA;
+
+    % guass elimination
+    for r=p+1:N
+        idx = p+1:N+1;
+        Ab(r, idx) = Ab(r, idx) - Ab(p, idx)*(Ab(r,p)/Ab(p,p));
+        Ab(r,p) = 0;
+    end
+end
+end
+\end{lstlisting}
+
+After performing Gaussian elimination with partial pivoting, we get the following upper triangular matrix:
+$$[U|c] = \begin{bmatrix}
+    5.0000 & 1.0000 & -100.0000 & -10.0000 & 0 \\ 
+    0 & -100.4000 & 39.0000 & 5.0000 & 0 \\
+    0 & 0 & 67.9024 & 3.6311 & 1.0000 \\
+    0 & 0 & 0 & 1.5597 & -0.3931
+\end{bmatrix}$$
+
+Then, we can use the upper triangular function to solve for x:
+
+\begin{lstlisting}[style=MatlabStyle]
+%% upper triangle solver
+function x = upper_triangle_solver(U, b)
+N = size(U,1);
+x = zeros(N,1);
+for n=N:-1:1
+    temp = 0;
+    for t=1:N-n    % times of doing minus
+        if N-n ~= 0
+            temp = temp + x(n+t)*U(n,n+t); % accmulate
+        end
+    end
+    temp = b(n) - temp;
+    x(n) = temp / U(n,n);
+end
+end
+\end{lstlisting}
+
+Finally, we get the solution of the linear system:
+$$x = \begin{bmatrix}
+    0.0604 \\ 
+    -0.0016 \\
+    0.0282 \\
+    -0.2520 
+    \end{bmatrix}
+$$
+
+See the code in \ref{sec:Appendix A} for details.
+
+\section{Question2}
+Use LU Factorization to solve the following linear system.
+$$\begin{bmatrix}
+2 & -1 & 0 & 0 & 0 \\
+-1 & 2 & -1 & 0 & 0 \\
+0 & -1 & 2 & -1 & 0 \\
+0 & 0 & -1 & 2 & -1 \\
+0 & 0 & 0 & -1 & 2
+\end{bmatrix}x=
+\begin{bmatrix}
+1 \\
+0 \\
+0 \\
+0 \\
+1
+\end{bmatrix}$$
+
+The main idea of LU factorization is to decompose matrix A into the product of a lower triangular matrix L and an upper triangular matrix U, such that A = LU. Then, we can solve the system Ax = b in two steps: first, we solve Ly = b using forward substitution, and then we solve Ux = y using back substitution.
+
+How to perform LU factorization:
+1. Initialize L as an identity matrix and U as a copy of A.
+2. For each column, perform elimination to create zeros below the diagonal in U, while storing the multipliers in L.
+
+
+The LU factorization of matrix A is as follows:
+$$L = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 \\
+-\frac{1}{2} & 1 & 0 & 0 & 0 \\
+0 & -\frac{2}{3} & 1 & 0 & 0 \\
+0 & 0 & -\frac{3}{4} & 1 & 0 \\
+0 & 0 & 0 & -\frac{4}{5} & 1
+\end{bmatrix}
+\qquad
+U = \begin{bmatrix}
+2 & -1 & 0 & 0 & 0 \\
+0 & \frac{3}{2} & -1 & 0 & 0 \\
+0 & 0 & \frac{4}{3} & -1 & 0 \\
+0 & 0 & 0 & \frac{5}{4} & -1 \\
+0 & 0 & 0 & 0 & \frac{6}{5}
+\end{bmatrix}$$
+Then, we can solve the system in two steps:
+
+1. Solve Ly = b using forward substitution.
+\begin{align*}
+y_{1} &= 1 \\
+-\frac{1}{2}y_{1} + y_{2} &= 0 \implies y_{2} = \frac{1}{2} \\
+-\frac{2}{3}y_{2} + y_{3} &= 0 \implies y_{3} = \frac{1}{3} \\
+-\frac{3}{4}y_{3} + y_{4} &= 0 \implies y_{4} = \frac{1}{4} \\
+-\frac{4}{5}y_{4}   + y_{5} &= 1 \implies y_{5} = \frac{6}{5}
+\end{align*}
+
+2. Solve Ux = y using back substitution.
+\begin{align*}
+\frac{6}{5}x_{5} &= \frac{6}{5} \implies x_{5} = 1 \\
+\frac{5}{4}x    _{4} - x_{5} &= \frac{1}{4} \implies x_{4} = 1 \\
+\frac{4}{3}x    _{3} - x_{4} &= \frac{1}{3} \implies x_{3} = 1 \\
+\frac{3}{2}x    _{2} - x_{3} &= \frac{1}{2} \implies x_{2} = 1 \\
+2x_{1} - x_{2} &= 1 \implies x_{1} = 1
+\end{align*}    
+
+Finally, we get the solution of the linear system:
+$$x = \begin{bmatrix}
+    1 \\ 
+    1 \\
+    1 \\
+    1 \\
+    1
+    \end{bmatrix}
+$$ 
+
+
+I use MATLAB to implement the LU factorization and solve the system. See \ref{sec:Appendix B} for details.
+
+
+
+\section{Question3}
+Use Guass-Seidel iteration to solve the following band system by program.
+
+
+$$
+\begin{alignedat}{9}
+12x_{1} &\;-\;& 2x_{2} &\;+\;& x_{3}      &      &      &      &= 5 \\[6pt]
+-2x_{1} &\;+\;& 12x_{2} &\;-\;& 2x_{3}    &\;+\;& x_{4} &      &= 5 \\[6pt]
+x_{1}   &\;-\;& 2x_{2}  &\;+\;& 12x_{3}   &\;-\;& 2x_{4} &\;+\;& x_{5} &= 5 \\[6pt]
+x_{2}   &\;-\;& 2x_{3}  &\;+\;& 12x_{4}   &\;-\;& 2x_{5} &\;+\;& x_{6} &= 5 \\[12pt]
+\vdots  &     & \vdots  &     & \vdots    &     & \vdots &     & \vdots \\[12pt]
+x_{46}  &\;-\;& 2x_{47} &\;+\;& 12x_{48}  &\;-\;& 2x_{49} &\;+\;& x_{50} &= 5 \\[6pt]
+x_{47}  &\;-\;& 2x_{48} &\;+\;& 12x_{49}  &\;-\;& 2x_{50} &      &      &= 5 \\[6pt]
+x_{48}  &\;-\;& 2x_{49} &\;+\;& 12x_{50}  &      &        &      &= 5
+\end{alignedat}
+$$
+
+I found that only the main diagonal and the two neighboring diagonals have nonzero elements, so this is a banded matrix.
+
+I use MATLAB to implement the Gauss-Seidel iteration method to solve the system. 
+
+The iteration formula is as follows:
+\begin{equation*}
+x_{i}^{(k+1)} = \frac{b_{i} - \sum_{j=1}^{i-1} a_{ij} x_{j}^{(k+1)} - \sum_{j=i+1}^{n} a_{ij} x_{j}^{(k)}}{a_{ii}}
+\quad \text{for } i = 1, 2, \ldots, n
+\end{equation*}
+
+\begin{lstlisting}[style=MatlabStyle]
+N = 50;
+A = zeros(N,N);
+b = 5*ones(N,1);
+x = zeros(N,1);
+% construct the band matrix A
+for i=1:N
+    A(i,i) = 12;
+
+    if i >=2
+        A(i-1,i) = -2;
+        A(i,i-1) = -2;
+
+    end
+
+    if i>=3
+        A(i-2,i) = 1;
+        A(i,i-2) = 1;
+    end
+end
+\end{lstlisting}
+
+The main iteration process is as follows:
+\begin{lstlisting}[style=MatlabStyle]
+for k = 1:max_iter
+    x_old= x;
+    for i = 1:N
+    %% iteration
+        temp1 = A(i,i+1:N)*x(i+1:N);
+        temp2 = A(i,1:i-1) * x_old(1:i-1);
+        x(i) = (b(i) - temp1 - temp2)/A(i,i);
+    end
+    if sqrt((sum(x) - sum(x_old))^2) < tol
+        break;
+    end
+
+end
+\end{lstlisting}
+
+See the following for the final result:
+\[
+x = \begin{pmatrix}
+0.4638 & 0.5373 & 0.5090 & 0.4982 & 0.4989 & 0.5000 & 0.5001 & 0.5000 & 0.5000 & 0.5000 \\
+0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 \\
+0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 \\
+0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 & 0.5000 \\
+0.5000 & 0.5000 & 0.5000 & 0.5001 & 0.5000 & 0.4989 & 0.4982 & 0.5090 & 0.5373 & 0.4638
+\end{pmatrix}
+\]
+
+For details, see the code in \ref{sec:Appendix C}.
+
+\section{Question4}
+Write a program to find all the eigen values of the following matrix.
+
+$$A=
+\begin{bmatrix}
+1 & 2 & -1 & \\
+1 & 0 & 1 & \\
+4 & -4 & 5 & 
+\end{bmatrix}$$
+Theory states that the eigenvalues of a matrix A can be found by solving the characteristic polynomial equation:
+$$det(A - \lambda{I}) = 0$$
+where I is the identity matrix of the same size as A, and $\lambda$ represents the eigenvalues.
+
+$A - \lambda I$ is given by:
+$$A - \lambda{I} =
+\begin{bmatrix}
+1 - \lambda & 2 & -1 \\
+1 & -\lambda & 1 \\
+4 & -4 & 5 - \lambda
+\end{bmatrix}$$
+To find the eigenvalues, we need to compute the determinant of $(A - \lambda I)$ and set it equal to zero. The determinant can be calculated using the formula for a $3\times 3$ matrix:
+$$\det(A - \lambda I) = (1-\lambda) \begin{vmatrix}
+-\lambda & 1 \\
+-4 & 5 - \lambda
+\end{vmatrix} - 2 \begin{vmatrix}
+1 & 1 \\
+4 & 5 - \lambda
+\end{vmatrix} + (-1) \begin{vmatrix}
+1 & -\lambda \\
+4 & -4
+\end{vmatrix}$$
+Calculating the $2\times 2$ determinants, we have:
+\begin{align*}
+\det(A - \lambda I) &= (1-\lambda)(-\lambda(5-\lambda) + 4) - 2(5 - \lambda - 4) + (4\lambda + 4) \\
+&= (1-\lambda)(-\lambda(5-\lambda) + 4) -2(1-\lambda) \\
+&= (1-\lambda)(\lambda-2)(\lambda-3)
+\end{align*}
+
+Setting the characteristic polynomial equal to zero gives us:
+$$(1-\lambda)(\lambda-2)(\lambda-3) = 0$$
+Thus, the eigenvalues of matrix A are:
+$$\lambda_{1} = 1, \quad \lambda_{2} = 2, \quad \lambda_{3} = 3$$
+
+I use MATLAB to implement the calculation of eigenvalues.
+QR algorithm is used to find all eigenvalues of the matrix.
+
+
+In this problem, we aim to compute all eigenvalues of the matrix
+\[
+A=\begin{bmatrix}
+1 & 2 & -1\\
+1 & 0 & 1\\
+4 & -4 & 5
+\end{bmatrix}
+\]
+without using the built-in \texttt{eig} function. Instead, we implement the QR iteration method, where the QR factorization is computed using Householder reflections. This ensures numerical stability and follows the classical approach used in numerical linear algebra.
+
+\subsection{Householder QR Factorization}
+
+Given a matrix $A\in\mathbb{R}^{n\times n}$, the Householder method constructs an orthogonal matrix $Q$ such that
+\[
+A = QR,
+\]
+where $R$ is upper triangular.
+
+For the first column of $A$, let
+\[
+x = A(1:n,1), \qquad
+v = x - \|x\| e_1, \qquad
+u = \frac{v}{\|v\|}.
+\]
+The corresponding Householder reflector is
+\[
+H_1 = I - 2uu^\top.
+\]
+This matrix satisfies
+\[
+H_1 A = 
+\begin{bmatrix}
+\ast & \ast & \ast\\
+0 & \ast & \ast\\
+0 & \ast & \ast
+\end{bmatrix}.
+\]
+
+The process is repeated on the trailing $(n-1)\times(n-1)$ submatrix to obtain a sequence of reflectors
+\[
+H_1,\,H_2,\,\dots,\,H_{n-1},
+\]
+which yield
+\[
+R = H_{n-1}\cdots H_2 H_1 A,
+\qquad
+Q = H_1 H_2 \cdots H_{n-1}.
+\]
+The matrix $Q$ is orthogonal, and the equality $A = QR$ holds.
+
+\subsection{QR Iteration Method}
+
+The QR iteration begins with
+\[
+A_0 = A.
+\]
+For each iteration $k$, we compute the QR factorization
+\[
+A_k = Q_k R_k,
+\]
+and form the next matrix
+\[
+A_{k+1} = R_k Q_k.
+\]
+
+A classical result states that if $A$ is diagonalizable with distinct eigenvalues, then the sequence $\{A_k\}$ converges to an upper triangular matrix:
+\[
+A_k \longrightarrow
+\begin{bmatrix}
+\lambda_1 & \ast & \ast\\
+0 & \lambda_2 & \ast\\
+0 & 0 & \lambda_3
+\end{bmatrix},
+\]
+where $\lambda_1, \lambda_2, \lambda_3$ are the eigenvalues of $A$.
+
+We monitor convergence by examining the off-diagonal part:
+\[
+\|A_k - \operatorname{diag}(A_k)\|_F < 10^{-12}.
+\]
+
+\subsection{Numerical Result}
+
+Applying the QR iteration with Householder QR to the matrix $A$, the iteration converges to an upper triangular matrix whose diagonal entries are:
+
+\[
+\lambda_1 = 1, \qquad
+\lambda_2 = 2, \qquad
+\lambda_3 = 3.
+\]
+
+Thus, all eigenvalues of $A$ are
+\[
+\boxed{\{1,\;2,\;3\}}.
+\]
+
+These results also agree with the eigenvalues obtained by solving the characteristic polynomial
+\[
+\det(\lambda I - A)
+= (\lambda - 1)(\lambda - 2)(\lambda - 3),
+\]
+confirming the correctness of the QR method.
+
+
+
+See the code in \ref{sec:Appendix D} for details.
+
+\newpage
+
+\appendix
+\section{Code of Question1}
+\label{sec:Appendix A}
+\begin{lstlisting}[style=MatlabStyle]
+clc; clear; close all;
+%% Define A and b
+A = [1, 20, -1, 0.001;
+     2, -5, 30, -0.1;
+     5, 1, -100, -10;
+     2, -100, -1, 1; ];
+b = [0;1;0;0];
+
+%% Slove the equation using guass elimination
+x = Guass_elimination_pivot(A, b)
+
+x_matlab = A\b
+x - x_matlab
+
+%% function
+function x = Guass_elimination_pivot(A, b)
+Ab = [A b]; % Augmented matrix
+N = size(Ab,1); % get the size of matrix (row)
+for p=1:N-1
+    temp = Ab(p,p);
+    idx = p; % find the biggest abs value of this column
+    for r=p+1:N
+        if abs(Ab(r,p)) > temp
+            idx = r;
+            temp = Ab(r,p);
+        end
+    end
+
+    % exchage row p and row r
+    AA = Ab(p,p:N+1); % store the origin value
+    Ab(p,p:N+1) = Ab(idx,p:N+1);
+    Ab(idx,p:N+1) = AA;
+
+    % guass elimination
+    for r=p+1:N
+        idx = p+1:N+1;
+        Ab(r, idx) = Ab(r, idx) - Ab(p, idx)*(Ab(r,p)/Ab(p,p));
+        Ab(r,p) = 0;
+    end
+end
+Ab
+x = upper_triangle_solver(Ab(1:N,1:N),Ab(:,N+1));
+end
+
+%% upper triangle solver
+function x = upper_triangle_solver(U, b)
+N = size(U,1);
+x = zeros(N,1);
+for n=N:-1:1
+    temp = 0;
+    for t=1:N-n    % times of doing minus
+        if N-n ~= 0
+            temp = temp + x(n+t)*U(n,n+t); % accmulate
+        end
+    end
+    temp = b(n) - temp;
+    x(n) = temp / U(n,n);
+end
+end
+\end{lstlisting}
+
+
+\section{Code of Question2}
+\label{sec:Appendix B}
+\begin{lstlisting}[style=MatlabStyle]
+clc;clear;close all;
+
+A = [
+2,-1,0,0,0;
+-1,2,-1,0,0;
+0,-1,2,-1,0;
+0,0,-1,2,-1;
+0,0,0,-1,2;
+];
+
+b=[1,0,0,0,1]';
+
+[P,L,U] = PLU(A);
+y = lower_triangle_solver(L,b)
+x = upper_triangle_solver(U,y)
+x_mat=A\b
+x-x_mat
+%% function
+function [P,L,U] = PLU(A)
+N = size(A,1); % get the size of matrix (row)
+P = eye(N);
+L = eye(N);
+U = A;
+
+for p=1:N-1  %only do N-1 times
+    temp = U(p,p);
+    idx = p; % find the biggest abs value of this column
+    for r=p+1:N
+        if abs(U(r,p)) > temp
+            idx = r;
+            temp = U(r,p);
+        end
+    end
+
+    % exchage row p and row r
+    temp_U = U(p,1:N); % store the origin value
+    temp_P = P(p,1:N);
+    U(p,1:N) = U(idx,1:N);
+    U(idx,1:N) = temp_U;
+    P(p,1:N) = P(idx,1:N);
+    P(idx,1:N) = temp_P;
+    % guass elimination -> upper_triangle
+     for r=p+1:N
+        idx = p+1:N;
+        temp = U(r,p)/U(p,p);
+        U(r, idx) = U(r, idx) - U(p, idx)*temp;
+        U(r,p) = temp;
+    end
+end
+
+%
+for r=2:N
+    L(r,1:r-1) = U(r,1:r-1);
+    U(r,1:r-1) = 0;
+end
+
+P
+L
+U
+L*U-P*A
+end
+
+%% upper_triangle_solver
+function x = upper_triangle_solver(U, b)
+N = size(U,1);
+x = zeros(N,1);
+for n=N:-1:1
+    temp = 0;
+    for t=1:N-n    % times of doing minus
+        if N-n ~= 0
+            temp = temp + x(n+t)*U(n,n+t); % accmulate
+        end
+    end
+    temp = b(n) - temp;
+    x(n) = temp / U(n,n);
+end
+end
+
+%% lower_triangle_solver
+function x = lower_triangle_solver(L, b)
+N = size(L,1);
+x = zeros(N,1);
+for n=1:N
+    temp = 0;
+    for t=1:N-1    % times of doing minus
+        if n ~= 1
+            temp = temp + x(t)*L(n,t); % accmulate
+        end
+    end
+    temp = b(n) - temp;
+    x(n) = temp / L(n,n);
+end
+
+end
+\end{lstlisting}
+
+\section{Code of Question3}
+\label{sec:Appendix C}
+\begin{lstlisting}[style=MatlabStyle]
+clc;clear;close all;
+N = 50;
+A = zeros(N,N);
+b = 5*ones(N,1);
+for i=1:N
+    A(i,i) = 12;
+
+    if i >=2
+        A(i-1,i) = -2;
+        A(i,i-1) = -2;
+
+    end
+
+    if i>=3
+        A(i-2,i) = 1;
+        A(i,i-2) = 1;
+    end
+end
+
+x = zeros(N,1);
+tol = 1e-9;
+max_iter = 1000;
+
+x_mat = A\b;
+
+for k = 1:max_iter
+    x_old= x;
+    for i = 1:N
+    %% iteration
+        temp1 = A(i,i+1:N)*x(i+1:N);
+        temp2 = A(i,1:i-1) * x_old(1:i-1);
+        x(i) = (b(i) - temp1 - temp2)/A(i,i);
+    end
+    if sqrt((sum(x) - sum(x_old))^2) < tol
+        break;
+    end
+
+end
+x-x_mat
+\end{lstlisting}
+
+\section{Code of Question4}
+\label{sec:Appendix D}
+\begin{lstlisting}[style=MatlabStyle]
+clc;clear;close all;
+A = [1, 2, -1;
+    1, 0, 1;
+    4, -4, 5];
+
+maxIter = 1000;
+tol = 1e-12;
+
+Ak = A;
+
+for k = 1:maxIter
+    % QR decomposition
+    [Q, R] = qr_function(Ak);
+
+    % Form next iteration matrix
+    Ak = R * Q;
+
+    % Check convergence: off-diagonal elements → 0
+    offdiag = Ak - diag(diag(Ak));
+    if norm(offdiag, 'fro') < tol
+        break;
+    end
+end
+
+eigvals_QR = diag(Ak);
+
+disp('QR Iteration eigenvalues:')
+disp(eigvals_QR)
+
+%% QR
+function [Q, R] = qr_function(A)
+N = size(A,1);
+R = A;
+Q = eye(N);
+for k = 1:N-1
+    x = R(k:N, k);
+    v = x;
+    v(1) = v(1) - norm(x);
+    v = v/norm(v);
+    H_sub = eye(N-k+1) - 2*v*v';
+    H = eye(N);
+    H(k:N, k:N) = H_sub;
+    R = H*R;
+    Q = Q*H;
+
+end
+end
+\end{lstlisting}
+
+\end{document}
+

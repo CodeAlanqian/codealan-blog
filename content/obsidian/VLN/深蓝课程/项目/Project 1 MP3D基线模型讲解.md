@@ -10,6 +10,7 @@ date: 2025-11-26
 lastmod: 2025-11-26
 draft: false
 summary: 讲解 Project1 Task2 中 Seq2Seq 基线模型的实现细节，并分析训练指标（SR、SPL、NavError）的预期趋势与含义。
+math: true
 tags:
 - VLN
 - Ubuntu

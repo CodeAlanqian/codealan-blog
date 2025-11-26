@@ -1,7 +1,7 @@
 ---
 title: "示例标题 / Example Title"
-date: 2025-01-01
-lastmod: 2025-01-01
+date: 2025-01-01T20:00:00+08:00
+lastmod: 2025-01-01T20:00:00+08:00
 draft: true
 tags:
 - Example
