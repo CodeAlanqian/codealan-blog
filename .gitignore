@@ -9,3 +9,9 @@ static/files/
 static/**/*.pdf
 content/**/*.pdf
 public/**/*.pdf
+
+# Local secrets / env config
+.env
+
+# Local runtime logs
+ai_log.log
