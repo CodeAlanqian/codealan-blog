@@ -81,14 +81,18 @@
           const centerY = height / 2;
 
           // Initialize nodes with random positions around center
-          const simNodes = topNodes.map((n, i) => ({
-            id: n.id,
-            count: n.count,
-            x: centerX + (Math.random() - 0.5) * 120,
-            y: centerY + (Math.random() - 0.5) * 120,
-            vx: 0,
-            vy: 0
-          }));
+          const simNodes = topNodes.map((n, i) => {
+            const color = palette[i % palette.length];
+            return {
+              id: n.id,
+              count: n.count,
+              color,
+              x: centerX + (Math.random() - 0.5) * 120,
+              y: centerY + (Math.random() - 0.5) * 120,
+              vx: 0,
+              vy: 0
+            };
+          });
           const idToNode = new Map(simNodes.map(n => [n.id, n]));
 
           const simEdges = graphEdges.map(e => ({
@@ -122,6 +126,9 @@
             const circle = document.createElementNS(svgNS, 'circle');
             circle.setAttribute('class', 'tag-graph-circle');
             circle.setAttribute('r', 10 + Math.min(node.count, 8));
+            const color = node.color || '#38bdf8';
+            circle.setAttribute('fill', color + '26');
+            circle.setAttribute('stroke', color);
             g.appendChild(circle);
 
             const label = document.createElementNS(svgNS, 'text');

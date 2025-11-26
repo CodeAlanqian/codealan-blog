@@ -557,13 +557,7 @@ a {
   margin: 0 auto;
 }
 
-.tag-graph-edge {
-  stroke: rgba(148, 163, 184, 0.6);
-}
-
 .tag-graph-circle {
-  fill: rgba(59, 130, 246, 0.16);
-  stroke: rgba(37, 99, 235, 0.7);
   stroke-width: 1.2;
 }
 
