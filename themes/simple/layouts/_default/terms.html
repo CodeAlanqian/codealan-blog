@@ -84,8 +84,8 @@
           const simNodes = topNodes.map((n, i) => ({
             id: n.id,
             count: n.count,
-            x: centerX + (Math.random() - 0.5) * 80,
-            y: centerY + (Math.random() - 0.5) * 80,
+            x: centerX + (Math.random() - 0.5) * 120,
+            y: centerY + (Math.random() - 0.5) * 120,
             vx: 0,
             vy: 0
           }));
@@ -115,7 +115,7 @@
 
             const circle = document.createElementNS(svgNS, 'circle');
             circle.setAttribute('class', 'tag-graph-circle');
-            circle.setAttribute('r', 12 + Math.min(node.count, 10));
+            circle.setAttribute('r', 10 + Math.min(node.count, 8));
             g.appendChild(circle);
 
             const label = document.createElementNS(svgNS, 'text');
@@ -131,10 +131,10 @@
           container.appendChild(svg);
 
           // Simple force-directed layout
-          const chargeStrength = -220;
-          const linkDistance = 120;
+          const chargeStrength = -340;
+          const linkDistance = 150;
           const linkStrength = 0.07;
-          const centerStrength = 0.02;
+          const centerStrength = 0.015;
           const damping = 0.9;
 
           let dragging = null;
