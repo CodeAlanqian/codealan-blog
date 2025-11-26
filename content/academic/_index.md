@@ -77,6 +77,27 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ---
 
+### Honors & Awards (Selected)
+
+- 2022 · Third-class Outstanding Student Scholarship, South China Normal University (SCNU)  
+- 2023 · Second-class Outstanding Student Scholarship, SCNU  
+- 2022 & 2023 · First Prize, Student Innovation Award, SCNU  
+- Outstanding Communist Youth League Member & Outstanding Youth League Cadre, School of Engineering  
+
+### Competitions (Selected)
+
+- National Undergraduate Intelligent Car Competition – Outdoor ROS Vehicle Race · National First Prize (5th nationwide)  
+- National Undergraduate Intelligent Car Competition · National Second Prize (ROS vehicle race)  
+- China Robotics and Artificial Intelligence Competition · National Second Prize  
+- RoboMaster University League · National Second Prize  
+
+### Experience
+
+- 2021.09–2022.06 · Vision group member, PIONEER RoboMaster Team, SCNU  
+- 2022.09–2024.06 · Co-founder & Vice Captain, VANGUARD RoboMaster Team  
+
+---
+
 ## 学术简介（中文）
 
 ### 基本信息
