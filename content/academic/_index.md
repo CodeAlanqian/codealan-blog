@@ -53,7 +53,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 - RoboMaster University Series (RMU), VANGUARD Team (2021.10–present)  
   - Co-founded and served as Vice Captain & vision/navigation lead.  
   - Worked on auto-aiming, ballistic trajectory computation, and sentinel robot navigation/decision-making.  
-  - The open-sourced ballistic solver project on GitHub has received dozens of stars and is referenced by multiple university teams.  
+  - The open-sourced ballistic solver project on GitHub (<https://github.com/CodeAlanqian/SolveTrajectory>) has received dozens of stars and is referenced by multiple university teams.  
 
 - National Undergraduate Intelligent Car Competition – Outdoor ROS Vehicle Race  
   - 2022–2023: participated in two consecutive editions; in the 18th competition, the team achieved National First Prize (5th place).  
@@ -142,7 +142,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 - RoboMaster 机甲大师高校系列赛（RMU）（2021.10–至今）  
   - 负责共创并担任 VANGUARD 战队副队长，负责视觉与导航组工作。  
   - 主要工作：自动瞄准系统、弹道解算、哨兵机器人导航与决策等。  
-  - 弹道解算项目已开源至 GitHub，获得数十个 Star，被多所高校队伍引用。  
+  - 弹道解算项目已开源至 GitHub（<https://github.com/CodeAlanqian/SolveTrajectory>），获得数十个 Star，被多所高校队伍引用。  
 
 - 全国大学生智能汽车竞赛——室外 ROS 无人车竞速赛（2022.09–2023.12）  
   - 第十八届：全国一等奖（全国第五名）。  
