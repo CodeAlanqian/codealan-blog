@@ -165,7 +165,6 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 - 2021.09–2022.06：华南师范大学 PIONEER 战队视觉组成员  
 - 2022.09–2024.06：创立 VANGUARD 战队并任副队长  
-- 2024.03–至今：互联网+ 项目《基于图像识别的发电场所自动巡检消防无人车》技术组成员  
 
 ---
 
