@@ -54,8 +54,18 @@
 常见路径说明：
 
 - 内容：`content/`  
-- 静态资源：`static/`（例如 `static/files/` 下的 PDF）  
-- 构建产物：`public/`  
+- 静态资源：`static/`（例如 `static/obsidian/` 下的图片、附件）  
+- 构建产物：`public/`（已通过 `.gitignore` 忽略，不进入仓库）  
+
+## Git 仓库与大文件策略
+
+- 仓库地址：`https://github.com/CodeAlanqian/codealan-blog.git`，默认分支：`master`。  
+- 忽略规则：  
+  - 忽略 Hugo 构建产物与锁文件：`public/`、`.hugo_build.lock`。  
+  - 忽略大文件与 PDF：`static/files/`、`static/**/*.pdf`、`content/**/*.pdf`、`public/**/*.pdf`。  
+- 历史清理：  
+  - 早期提交曾包含 VLN 讲义、项目 PDF 以及 `public/` 下的大文件，收到 GitHub 大文件警告后，已重建 git 历史，仅保留“干净”的初始提交，并强制推送覆盖远程历史。  
+  - 现在仓库只跟踪源码和内容，不再保存构建结果或大体积资产。  
 
 ## 学术主页（/academic/）
 
@@ -68,4 +78,3 @@
 页尾附有一句站点说明：
 
 > 本站记录我的技术笔记、想法与实践，写作工具是 Obsidian，发布用 Hugo。
-

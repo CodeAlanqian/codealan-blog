@@ -77,9 +77,8 @@
 ## Hugo 主题与前端功能改动汇总
 
 - 代码展示与交互  
-  - 自定义 `code-block` 包装 `<pre>`，统一样式、复制按钮、滚动条。  
+  - 自定义 `code-block` 包装 `<pre>`，统一样式、复制按钮、滚动条，所有代码块默认完全展开显示（不再折叠长代码）。  
   - 使用 Hugo Chroma + GitHub 风格高亮，支持浅色/深色不同配色。  
-  - 为长代码块自动添加“展开全部代码 / 收起代码”开关，默认折叠超长片段。  
 
 - 文章阅读体验  
   - 文章顶部加入阅读进度条（根据 `.post` 高度实时更新）。  
@@ -136,6 +135,7 @@
 - 标签与颜色规则  
   - 为标签元素增加 `data-tag-key` 属性（单篇与列表卡片中），用于 CSS 精细控制：  
     - `vln` → 蓝色；`ros` / `ros_note` → 绿色；`docker` → 蓝青；`rl` → 橙色；`llm` → 紫色；`obsidian` → 灰色。  
+    - 后续扩展了更多标签配色：`ubuntu`、`essay`/`other`、`navigation`、`项目`/`project`、`深蓝课程`/`course`、`nextcloud`、`zotero`、`latex`、`habitat` 等。  
   - 所有文章保证至少有一个 tag：  
     - `scripts/fix_tags_vln.py`：确保 `content/obsidian/VLN/` 下所有 VLN 文章包含 `VLN` 标签。  
     - `scripts/autotag.py`：对 `content/` 下所有 Markdown 按路径和内容自动补充语义标签（Docker/ROS/VLN/深蓝课程/项目/Zotero/Latex/Other/Essay/ideas/RL/LLM/Habitat/Nextcloud 等），保留已有 tag 并截断到最多 6 个。  
@@ -172,5 +172,78 @@
     - 使用 `scripts/fix_series_vln.py` 为 VLN 文件添加 `series: ["VLN课程"]`。  
     - 在单篇文章底部显示专栏目录块。  
   - 现已按需求完全回滚：  
-    - `scripts/remove_series.py` 用于从所有 Markdown front matter 中移除 `series` 块。  
-    - `config.yaml` 中去除 `series` taxonomy，模板中删除专栏相关展示。  
+  - `scripts/remove_series.py` 用于从所有 Markdown front matter 中移除 `series` 块。  
+  - `config.yaml` 中去除 `series` taxonomy，模板中删除专栏相关展示。  
+
+---
+
+## 导航、搜索与学术页的后续调整
+
+- 顶部导航与搜索  
+  - 将主菜单中的“搜索”文本项替换为放大镜图标按钮，位于主题切换按钮之后，点击仍跳转 `/search/`。  
+  - 为搜索图标添加统一的外框与悬浮样式，风格与主题切换按钮一致（圆角 + 边框 + hover 浮起）。  
+  - 保持键盘快捷键 `/` 聚焦搜索输入框或跳转搜索页不变。  
+
+- 移动端导航优化  
+  - 多轮调优移动端 `.site-header` 的 `padding`、`gap` 与字体大小：  
+    - 收窄导航栏高度（减小上下内边距）。  
+    - 放大品牌标题与导航项字体，使小屏阅读更清晰。  
+  - 统一移动端顶部三个控件的视觉大小：返回按钮箭头、主题切换图标、搜索图标在手机上大小一致（通过 font-size 与 span 选择器控制）。  
+  - 最终保留“始终展开”的移动端菜单布局（未启用折叠菜单），保证简单直接。  
+
+- 学术页与路由调整  
+  - 将原来的 `关于` 页改造为“学术主页”，内容以学术信息为主：  
+    - 英文部分：Academic Profile（基本信息、研究兴趣、Preprints & Publications 占位、教育经历、项目与实践、Ongoing Directions、Contact）。  
+    - 中文部分：学术简介、研究兴趣、教育经历、项目与实践、正在进行的方向、联系方式。  
+  - 在学术页顶部加入头像卡片（`/gyq.jpg`），作为学术 Profile 的视觉中心。  
+  - 路由调整：  
+    - 内容文件为 `content/academic/_index.md`，front matter 中声明 `url: "/academic/"`。  
+    - `config.yaml` 菜单中“学术”指向 `/academic/`（不再使用 `/about/`）。  
+
+- B 站代表视频区  
+  - 在学术页底部新增“📺 我的 B 站代表视频”分区，并在标题前加分隔线 `---`。  
+  - 嵌入 5 个 B 站播放器 `<iframe>`，统一样式：  
+    - `width: 100%; height: 450px; margin-bottom: 1rem;`  
+    - `frameborder="0"`, `border="0"`, `allowfullscreen="true"`, 并显式加入 `autoplay=0`。  
+
+- 代码折叠行为更新  
+  - 移除前端对长代码块自动折叠与“展开全部代码 / 收起代码”按钮的逻辑。  
+  - 当前所有代码块始终完全展开，仅保留语言徽标和复制按钮，提高可复制性与可读性。  
+
+- 搜索结果标签一致性  
+  - 搜索页模板 `themes/simple/layouts/search/list.html` 中的标签输出添加 `data-tag-key` 属性，与列表/文章页统一。  
+  - 搜索结果中的标签颜色规则与主站标签完全一致。  
+
+---
+
+## Git 仓库与大文件处理
+
+- Git 仓库初始化与远程  
+  - 在 `/home/ubuntu/mypage` 目录初始化 git 仓库，配置：  
+    - 用户名：`CodeAlan`  
+    - 邮箱：`codealan@qq.com`  
+  - 初始提交包含当前 Hugo 项目及 `public/` 构建产物。  
+  - 远程仓库：`origin = https://github.com/CodeAlanqian/codealan-blog.git`，默认分支为 `master`。  
+
+- `.gitignore` 配置  
+  - 忽略 Hugo 构建锁与输出目录：  
+    - `.hugo_build.lock`  
+    - `public/`  
+  - 忽略大文件与 PDF：  
+    - `static/files/`  
+    - `static/**/*.pdf`  
+    - `content/**/*.pdf`  
+    - `public/**/*.pdf`  
+  - 目的：  
+    - 防止将构建产物和课程/论文 PDF 等大文件提交到仓库。  
+    - 避免触发 GitHub 对 >50MB 文件的警告。  
+
+- 清理历史中的大文件（重建历史）  
+  - 由于早期 commit 中已包含若干大 PDF（例如 VLN 课程讲义、项目 PDF 和 `public` 里的生成文件），GitHub 发出大文件警告。  
+  - 为获得“干净”的历史，执行了以下步骤：  
+    - 删除旧的 `.git` 目录，等价于重置本地 git 历史。  
+    - 重新 `git init`、`git add .`（在新的 `.gitignore` 生效的前提下）。  
+    - 创建新的 root commit：`Initial clean history import`，其中不再包含任何 `public/` 或 PDF 文件。  
+  - 之后通过 `git push -f origin master` 覆盖远程 `master` 历史，GitHub 仓库的历史中不再包含大文件。  
+
+> 当前推荐工作流：只提交源码与内容（`content/`、`layouts/`、`themes/`、脚本等），在服务器本地运行 `./build.sh` 生成 `public/` 用于 Nginx 部署；PDF 与其他大资产通过 `static/obsidian` 或外链管理，避免纳入 git 历史。  
