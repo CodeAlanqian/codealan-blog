@@ -49,6 +49,7 @@
   <main class="site-main">
     {{ block "main" . }}{{ end }}
   </main>
+  {{ partial "ai-chat.html" . }}
   <button class="back-top" id="backTopBtn" type="button" aria-label="回到顶部">↑</button>
   <footer class="site-footer">
     <p>© {{ now.Format "2006" }} CodeAlan · Powered by Hugo</p>
@@ -520,6 +521,223 @@
       });
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
+    })();
+    (function() {
+      const widget = document.getElementById('aiChatWidget');
+      if (!widget) return;
+      const toggle = document.getElementById('aiChatToggle');
+      const panel = document.getElementById('aiChatPanel');
+      const closeBtn = document.getElementById('aiChatClose');
+      const form = document.getElementById('aiChatForm');
+      const input = document.getElementById('aiChatInput');
+      const body = document.getElementById('aiChatBody');
+      const sendBtn = document.getElementById('aiChatSend');
+
+      let isOpen = false;
+      let sending = false;
+      const history = [];
+
+      const escapeHtml = (str) => {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      };
+
+      const renderInlineMarkdown = (text) => {
+        let out = escapeHtml(text);
+        // 链接 [text](url)
+        out = out.replace(/\[([^\]]+)]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+        // 行内代码 `code`
+        out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // 加粗 **text** 或 __text__
+        out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        out = out.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+        return out;
+      };
+
+      const renderMarkdown = (text) => {
+        const lines = text.split(/\r?\n/);
+        const parts = [];
+        let inCode = false;
+        let codeLang = '';
+        let codeLines = [];
+        let inList = false;
+        let listItems = '';
+
+        const flushCode = () => {
+          if (!inCode) return;
+          const code = codeLines.join('\n');
+          const cls = codeLang ? ` class="language-${codeLang}"` : '';
+          parts.push(`<pre><code${cls}>${escapeHtml(code)}</code></pre>`);
+          inCode = false;
+          codeLang = '';
+          codeLines = [];
+        };
+
+        const flushList = () => {
+          if (!inList) return;
+          parts.push(`<ul>${listItems}</ul>`);
+          inList = false;
+          listItems = '';
+        };
+
+        for (let raw of lines) {
+          const line = raw.replace(/\s+$/, '');
+
+          // 代码块 ```lang
+          const fenceMatch = line.match(/^```(\w+)?\s*$/);
+          if (fenceMatch) {
+            if (inCode) {
+              flushCode();
+            } else {
+              flushList();
+              inCode = true;
+              codeLang = fenceMatch[1] || '';
+              codeLines = [];
+            }
+            continue;
+          }
+
+          if (inCode) {
+            codeLines.push(raw);
+            continue;
+          }
+
+          const trimmed = line.trim();
+          if (!trimmed) {
+            flushList();
+            continue;
+          }
+
+          // 标题
+          const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+          if (headingMatch) {
+            flushList();
+            const level = headingMatch[1].length;
+            const content = headingMatch[2];
+            parts.push(`<h${level}>${renderInlineMarkdown(content)}</h${level}>`);
+            continue;
+          }
+
+          // 无序列表
+          const listMatch = trimmed.match(/^[-*]\s+(.+)$/);
+          if (listMatch) {
+            const item = renderInlineMarkdown(listMatch[1]);
+            if (!inList) {
+              inList = true;
+              listItems = '';
+            }
+            listItems += `<li>${item}</li>`;
+            continue;
+          }
+
+          // 普通段落
+          flushList();
+          parts.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+        }
+
+        flushCode();
+        flushList();
+        return parts.join('\n');
+      };
+
+      const setOpen = (open) => {
+        isOpen = open;
+        panel.classList.toggle('is-open', open);
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+        if (open && input) {
+          setTimeout(() => input.focus(), 80);
+        }
+      };
+
+      const appendMessage = (role, text) => {
+        if (!body) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ai-chat-message ' + (role === 'assistant' ? 'ai-chat-message-assistant' : 'ai-chat-message-user');
+        const bubble = document.createElement('div');
+        bubble.className = 'ai-chat-bubble';
+        if (role === 'assistant') {
+          bubble.innerHTML = renderMarkdown(text);
+        } else {
+          bubble.textContent = text;
+        }
+        wrapper.appendChild(bubble);
+        body.appendChild(wrapper);
+        body.scrollTop = body.scrollHeight;
+      };
+
+      const setSending = (v) => {
+        sending = v;
+        if (sendBtn) {
+          sendBtn.disabled = v;
+          sendBtn.textContent = v ? '思考中…' : '发送';
+        }
+        if (input) {
+          input.disabled = v;
+        }
+      };
+
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          setOpen(!isOpen);
+        });
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => setOpen(false));
+      }
+
+      if (form && input) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (sending) return;
+          const text = input.value.trim();
+          if (!text) return;
+          appendMessage('user', text);
+          history.push({ role: 'user', content: text });
+          input.value = '';
+          setSending(true);
+          const host = window.location.hostname;
+          const isLocal =
+            host === 'localhost' ||
+            host === '127.0.0.1' ||
+            host === '0.0.0.0';
+          const endpoint = isLocal
+            ? 'http://127.0.0.1:9000/api/ai/chat'
+            : '/api/ai/chat';
+          fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: history }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error('HTTP ' + res.status);
+              }
+              return res.json();
+            })
+            .then((data) => {
+              const reply = (data && data.reply) || '（AI 响应为空）';
+              history.push({ role: 'assistant', content: reply });
+              appendMessage('assistant', reply);
+            })
+            .catch(() => {
+              appendMessage('assistant', '调用个人 AI 失败，请稍后重试，或检查后端服务 / 网络连接。');
+            })
+            .finally(() => {
+              setSending(false);
+            });
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.requestSubmit();
+          }
+        });
+      }
     })();
     {{ if .Params.math }}
     renderMathInElement(document.body, {

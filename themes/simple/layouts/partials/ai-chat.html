@@ -1,0 +1,32 @@
+<div class="ai-chat-widget" id="aiChatWidget">
+  <button class="ai-chat-toggle" id="aiChatToggle" type="button" aria-label="打开个人 AI 助手">
+    <span class="ai-chat-toggle-icon">🤖</span>
+    <span class="ai-chat-toggle-label">AI</span>
+  </button>
+  <div class="ai-chat-panel" id="aiChatPanel" aria-hidden="true">
+    <div class="ai-chat-header">
+      <div class="ai-chat-title">
+        <span class="ai-chat-title-main">个人 AI 助手</span>
+        <span class="ai-chat-title-sub">本地代理 DeepSeek · 仅你可见</span>
+      </div>
+      <button class="ai-chat-close" id="aiChatClose" type="button" aria-label="关闭 AI 面板">×</button>
+    </div>
+    <div class="ai-chat-body" id="aiChatBody">
+      <div class="ai-chat-message ai-chat-message-assistant">
+        <div class="ai-chat-bubble">
+          嗨，我是你的个人 AI 助手。可以问我关于博客内容、开发环境、命令速查等问题～
+        </div>
+      </div>
+    </div>
+    <form class="ai-chat-input-bar" id="aiChatForm">
+      <textarea
+        id="aiChatInput"
+        class="ai-chat-input"
+        rows="1"
+        placeholder="输入你的问题，按 Enter 发送（Shift+Enter 换行）"
+      ></textarea>
+      <button class="ai-chat-send" id="aiChatSend" type="submit">发送</button>
+    </form>
+  </div>
+</div>
+
