@@ -98,29 +98,45 @@ tags:
   - `.gitignore` 忽略 `public/`、`static/files/`、以及所有 `*.pdf`（`static/**`、`content/**`、`public/**`）。  
   - 历史已经重建，当前仓库只包含源码与内容。  
 - **经验：**  
-  - 只在服务器本地运行 `./build.sh` 生成 `public/`，不要把构建产物提交到 Git。  
+  - 在服务器本地构建站点：  
+    ```bash
+    ./build.sh
+    ```  
+  - 不要把 `public/` 和 PDF 等大文件提交到 Git。  
 
 ### Nginx / stream 分流
 
 - **问题：** 443 端口既要给博客用，又要给 VLESS-Reality 使用。  
 - **解决：**  
   - 使用 `stream` + `ssl_preread` 按 SNI 分流：`aws.amazon.com` → sui，`codealan.top` / `www.codealan.top` → 博客。  
-  - 注意 `nginx.conf` 需要 `include /etc/nginx/stream.conf;`，否则不会生效。  
+  - 注意 `nginx.conf` 需要包含 `stream` 配置，例如：  
+    ```nginx
+    include /etc/nginx/stream.conf;
+    ```  
 
 ### Docker / GPU 环境
 
 - **问题示例：** 容器里看不到 GPU / 驱动版本不匹配。  
 - **排查点：**  
   - 宿主机是否安装正确的 NVIDIA 驱动 + `nvidia-container-toolkit`。  
-  - `docker run` 时是否加了 `--gpus all` 或正确的 `--runtime`。  
-  - 宿主机 `nvidia-smi` 正常再进入容器调试。  
+  - 检查宿主机与容器中的 GPU 可见性：  
+    ```bash
+    # 宿主机检查
+    nvidia-smi
+
+    # 容器中检查（示例）
+    docker run --rm --gpus all nvidia/cuda:12.2.0-base nvidia-smi
+    ```  
 
 ### 终端与 tmux
 
 - **问题：** tmux 中中文 / Powerline 字体错位。  
 - **经验：**  
   - 终端统一使用 Nerd Font / 等宽字体。  
-  - 确认 `$LANG` 与 locale 设置一致（如 `zh_CN.UTF-8`）。  
+  - 确认 `$LANG` 与 locale 设置一致（如 `zh_CN.UTF-8`）：  
+    ```bash
+    echo $LANG
+    locale
+    ```  
 
 > 之后遇到新的环境坑、兼容性问题，可以按模块继续往这个页面追加小节即可。  
-
