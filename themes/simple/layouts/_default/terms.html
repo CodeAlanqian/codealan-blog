@@ -79,7 +79,12 @@
 
           const centerX = width / 2;
           const centerY = height / 2;
-          const palette = ['#94a3b8', '#38bdf8', '#22c55e', '#f97316', '#a855f7', '#ef4444'];
+          // 调色盘：为前 maxNodes 个标签尽量分配不同颜色
+          const palette = [
+            '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6',
+            '#0ea5e9', '#6366f1', '#8b5cf6', '#a855f7', '#ec4899',
+            '#f97373', '#4b5563', '#10b981', '#facc15'
+          ];
 
           // Initialize nodes with random positions around center
           const simNodes = topNodes.map((n, i) => {
