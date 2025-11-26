@@ -1,0 +1,13 @@
+{{- $u := .Destination | safeURL -}}
+{{- if hasPrefix $u "file://" -}}
+  <a href="#"
+     title="本地文件链接已在网页中禁用：{{ $u }}">
+    {{ .Text | safeHTML }}
+  </a>
+{{- else -}}
+  <a href="{{ $u }}"
+     {{ with .Title }}title="{{ . }}"{{ end }}>
+    {{ .Text | safeHTML }}
+  </a>
+{{- end -}}
+

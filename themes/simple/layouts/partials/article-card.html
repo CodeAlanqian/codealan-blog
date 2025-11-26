@@ -1,0 +1,24 @@
+{{ $dataTags := slice }}
+{{ with .Params.tags }}
+  {{ range . }}
+    {{ $dataTags = $dataTags | append (. | urlize) }}
+  {{ end }}
+{{ end }}
+<article class="card"{{ if gt (len $dataTags) 0 }} data-tags="{{ delimit $dataTags "," }}"{{ end }}>
+  <a class="card-link" href="{{ .RelPermalink }}">
+    <div class="card-head">
+      <h2>{{ .Title }}</h2>
+      <p class="meta">
+        {{ .Date.Format "2006-01-02" }}
+        {{ with .Params.tags }}
+          {{ range . }}
+            <span class="tag" data-tag-key="{{ . | urlize }}">{{ . }}</span>
+          {{ end }}
+        {{ end }}
+      </p>
+    </div>
+    {{ $summary := .Summary | plainify | truncate 180 }}
+    {{ if not $summary }}{{ $summary = .Plain | plainify | truncate 180 }}{{ end }}
+    <p class="summary">{{ $summary }}</p>
+  </a>
+</article>

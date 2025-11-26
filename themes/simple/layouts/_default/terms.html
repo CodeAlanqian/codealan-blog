@@ -1,0 +1,18 @@
+{{ define "main" }}
+  {{ $kind := .Data.Singular }}
+  {{ $isTag := eq $kind "tag" }}
+  {{ $isSeries := eq $kind "series" }}
+  <section class="hero">
+    <p class="eyebrow">{{ if $isTag }}标签{{ else if $isSeries }}专栏{{ else }}分类{{ end }}</p>
+    <h1>{{ if $isTag }}全部标签{{ else if $isSeries }}全部专栏{{ else }}全部分类{{ end }}</h1>
+    <p class="lede">共 {{ len .Data.Terms }} 个{{ if $isTag }}标签{{ else if $isSeries }}专栏{{ else }}分类{{ end }}</p>
+  </section>
+  <section class="tag-cloud-list">
+    {{ range $name, $term := .Data.Terms }}
+      <a class="tag-pill tag-cloud-item" href="{{ $term.Page.RelPermalink }}">
+        <span class="tag-name">{{ $name }}</span>
+        <span class="tag-count">{{ $term.Count }}</span>
+      </a>
+    {{ end }}
+  </section>
+{{ end }}

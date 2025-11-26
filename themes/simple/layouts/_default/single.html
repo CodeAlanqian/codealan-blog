@@ -1,0 +1,77 @@
+{{ define "main" }}
+  <article class="post">
+    <header class="post-header">
+      <p class="meta">
+        <span>{{ .Date.Format "2006-01-02" }}</span>
+        {{ if ne .Lastmod .Date }}
+          <span class="meta-updated">· 更新于 {{ .Lastmod.Format "2006-01-02" }}</span>
+        {{ end }}
+        {{ with .Params.tags }}
+          {{ range . }}
+            <a class="tag" data-tag-key="{{ . | urlize }}" href="{{ (print "/tags/" (. | urlize) "/") | relURL }}">{{ . }}</a>
+          {{ end }}
+        {{ end }}
+      </p>
+      <h1>{{ .Title }}</h1>
+      <p class="meta meta-views">
+        <span class="icon-eye" aria-hidden="true">👁</span>
+        <span class="view-count" data-key="{{ .RelPermalink }}">0</span> 次浏览 ·
+        约 {{ .ReadingTime }} 分钟阅读 · {{ .WordCount }} 字
+      </p>
+      {{ with .Params.cover }}
+        <figure class="cover">
+          <img src="{{ . | relURL }}" alt="{{ $.Title }}">
+        </figure>
+      {{ end }}
+    </header>
+    <div class="post-body">
+      {{ with .TableOfContents }}
+        <nav class="toc">
+          <p class="toc-title">目录</p>
+          {{ . }}
+        </nav>
+      {{ end }}
+      <div class="content">
+        {{ $html := .Content | replaceRE "(<pre[\\s\\S]*?</pre>)" (partial "code-block.html" "${1}") }}
+        {{ $html = $html | replaceRE "<img([^>]*?)>" "<img loading=\"lazy\"$1>" }}
+        {{ $html | safeHTML }}
+      </div>
+    </div>
+    <footer class="post-footer">
+      <nav class="post-nav">
+        {{ with .Prev }}
+          <a class="post-nav-link prev" href="{{ .RelPermalink }}">← {{ .Title }}</a>
+        {{ end }}
+        {{ with .Next }}
+          <a class="post-nav-link next" href="{{ .RelPermalink }}">{{ .Title }} →</a>
+        {{ end }}
+      </nav>
+      <button class="post-share" type="button" id="postShareBtn">复制本页链接</button>
+      {{ $current := . }}
+      {{ $allPages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
+      {{ $others := where $allPages "Permalink" "ne" $current.Permalink }}
+      {{ $related := slice }}
+      {{ with .Params.tags }}
+        {{ $related = where $others "Params.tags" "intersect" . }}
+      {{ end }}
+      {{ if le (len $related) 0 }}
+        {{ $related = $others.ByDate.Reverse }}
+      {{ end }}
+      {{ $related = first 4 $related }}
+      {{ if gt (len $related) 0 }}
+        <section class="related-block">
+          <p class="related-title">相关文章</p>
+          <ul class="related-list">
+            {{ range $related }}
+              <li class="related-item">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                <span class="related-date">{{ .Date.Format "2006-01-02" }}</span>
+              </li>
+            {{ end }}
+          </ul>
+        </section>
+      {{ end }}
+      <button class="post-ppt" type="button" id="postPptBtn">PPT 式阅读</button>
+    </footer>
+  </article>
+{{ end }}

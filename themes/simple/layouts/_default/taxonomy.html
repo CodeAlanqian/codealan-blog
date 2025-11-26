@@ -1,0 +1,18 @@
+{{ define "main" }}
+  {{ $paginator := .Paginate .Pages }}
+  {{ $kind := .Data.Singular }}
+  {{ $isTag := eq $kind "tag" }}
+  {{ $isSeries := eq $kind "series" }}
+  <section class="hero">
+    <p class="eyebrow">{{ if $isTag }}标签{{ else if $isSeries }}专栏{{ else }}分类{{ end }}</p>
+    <h1># {{ .Title }}</h1>
+    <p class="lede">共 {{ $paginator.TotalNumberOfElements }} 篇文章</p>
+    {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
+  </section>
+  <section class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+    {{ partial "pagination.html" . }}
+  </section>
+{{ end }}

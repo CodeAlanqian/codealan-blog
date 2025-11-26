@@ -1,0 +1,22 @@
+{{ define "main" }}
+  <section class="hero">
+    <p class="eyebrow">归档</p>
+    <h1>{{ .Title }}</h1>
+  </section>
+  <section class="archive-list">
+    {{ $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
+    {{ range $group := $pages.GroupByDate "2006" }}
+      <div class="archive-year">
+        <h2 class="archive-year-title">{{ $group.Key }}</h2>
+        <ul class="archive-items">
+          {{ range $group.Pages.ByDate.Reverse }}
+            <li class="archive-item">
+              <span class="archive-date">{{ .Date.Format "01-02" }}</span>
+              <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            </li>
+          {{ end }}
+        </ul>
+      </div>
+    {{ end }}
+  </section>
+{{ end }}

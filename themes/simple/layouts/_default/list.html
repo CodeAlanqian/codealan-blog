@@ -1,0 +1,42 @@
+{{ define "main" }}
+  {{ $pages := .Pages }}
+  {{ if .IsHome }}
+    {{ $pages = where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
+  {{ end }}
+  <section class="hero">
+    <h1>{{ .Title }}</h1>
+    {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
+  </section>
+  <section class="profile">
+    <div class="avatar">
+      <img src="/avatar.png" alt="CodeAlan">
+    </div>
+    <div>
+      <h2 class="name">Hi 👋 This is 龚易乾 (Yiqian Gong, CodeAlan)</h2>
+      <p class="bio">
+        🎓 南方科技大学（SUSTech）电子信息硕士在读，研究方向：视觉语言导航 VLN（Vision-Language Navigation，室内/地面无人机）。<br>
+        🔬 探索 RL 与 LLM；编程语言：C/C++、Python、Java、Go、Qt、Flutter 等。<br>
+        🤖 曾在华南师范大学（SCNU）RoboMaster 战队 VANGUARD 任副队长/视觉组长（通信工程本科）。<br>
+        📫 联系：codealan@qq.com ｜ QQ: 2546379375 ｜ <a href="https://github.com/CodeAlanqian" target="_blank" rel="noreferrer">GitHub</a> ｜ <a href="https://space.bilibili.com/352156963?spm_id_from=333.1007.0.0" target="_blank" rel="noreferrer">B站</a>
+      </p>
+    </div>
+  </section>
+  {{ $paginator := .Paginate $pages }}
+  {{ if .IsHome }}
+    {{ $tags := site.Taxonomies.tags }}
+    {{ if gt (len $tags) 0 }}
+      <section class="tag-filter">
+        <a class="tag-pill is-active" href="{{ "/" | relURL }}">全部</a>
+        {{ range $name, $_ := $tags }}
+          <a class="tag-pill" href="{{ (printf "/tags/%s/" ($name | urlize)) | relURL }}">{{ $name }}</a>
+        {{ end }}
+      </section>
+    {{ end }}
+  {{ end }}
+  <section class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+    {{ partial "pagination.html" . }}
+  </section>
+{{ end }}

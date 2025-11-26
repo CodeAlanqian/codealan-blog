@@ -1,0 +1,11 @@
+# Hugo build lock
+.hugo_build.lock
+
+# Hugo output
+public/
+
+# Local files and heavy assets
+static/files/
+static/**/*.pdf
+content/**/*.pdf
+public/**/*.pdf

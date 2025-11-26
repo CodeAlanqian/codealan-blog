@@ -1,0 +1,123 @@
+{{ define "main" }}
+  <section class="hero">
+    <p class="eyebrow">搜索</p>
+    <h1>{{ .Title }}</h1>
+    <p class="lede">输入标题、标签或内容关键字，实时筛选文章。</p>
+  </section>
+  <section class="search-box">
+    <input
+      id="searchInput"
+      class="search-input"
+      type="search"
+      placeholder="搜索站内文章…"
+      autocomplete="off"
+    >
+  </section>
+  <section class="search-results" id="searchResults">
+    <p class="search-hint">开始输入以查看搜索结果。</p>
+  </section>
+  <script>
+    const SEARCH_PAGES = (function() {
+      {{- $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") -}}
+      {{- $items := slice -}}
+      {{- range $p := $pages -}}
+        {{- $obj := dict
+          "title"   $p.Title
+          "url"     $p.RelPermalink
+          "summary" ($p.Summary | plainify | truncate 160)
+          "tags"    ($p.Params.tags | default (slice))
+          "date"    ($p.Date.Format "2006-01-02")
+          "ts"      ($p.Date.Unix)
+        -}}
+        {{- $items = $items | append $obj -}}
+      {{- end -}}
+      return {{ $items | jsonify }};
+    })();
+    (function() {
+      const input = document.getElementById('searchInput');
+      const resultsEl = document.getElementById('searchResults');
+      if (!input || !resultsEl || !SEARCH_PAGES) return;
+      const pages = Array.isArray(SEARCH_PAGES) ? SEARCH_PAGES : JSON.parse(SEARCH_PAGES);
+      const renderResults = (items, query) => {
+        if (!items.length) {
+          resultsEl.innerHTML = '<p class="search-hint">没有找到匹配的文章。</p>';
+          return;
+        }
+        const html = items.map(item => {
+          const tags = (item.tags || []).map(t => {
+            const key = (t || '').toString().toLowerCase().replace(/\s+/g, '_');
+            return '<span class="tag" data-tag-key="' + key + '">' + t + '</span>';
+          }).join('');
+          return (
+            '<article class="card">' +
+              '<a class="card-link" href="' + item.url + '">' +
+                '<div class="card-head">' +
+                  '<h2>' + item.title + '</h2>' +
+                  '<p class="meta">' + item.date + (tags ? ' ' + tags : '') + '</p>' +
+                '</div>' +
+                (item.summary ? '<p class="summary">' + item.summary + '</p>' : '') +
+              '</a>' +
+            '</article>'
+          );
+        }).join('');
+        resultsEl.innerHTML = '<div class="search-result-list">' + html + '</div>';
+      };
+      const normalize = (s) => (s || '').toString().toLowerCase();
+      const tokenize = (q) => normalize(q).split(/[\s\u3000]+/).filter(Boolean);
+
+      const scorePage = (page, tokens) => {
+        if (!tokens.length) return 0;
+        const title = normalize(page.title);
+        const summary = normalize(page.summary);
+        const tagsText = normalize((page.tags || []).join(' '));
+        let score = 0;
+        for (const tok of tokens) {
+          let hit = false;
+          if (title.includes(tok)) {
+            score += 5;
+            hit = true;
+          }
+          if (tagsText.includes(tok)) {
+            score += 3;
+            hit = true;
+          }
+          if (summary.includes(tok)) {
+            score += 1;
+            hit = true;
+          }
+          if (!hit) return 0;
+        }
+        return score;
+      };
+
+      // 默认展示最近文章，画面不空
+      const initial = pages
+        .slice()
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+        .slice(0, 10);
+      renderResults(initial, '');
+
+      const onInput = () => {
+        const q = input.value;
+        const tokens = tokenize(q);
+        if (!tokens.length) {
+          renderResults(initial, '');
+          return;
+        }
+        const results = pages
+          .map(p => ({ page: p, score: scorePage(p, tokens) }))
+          .filter(x => x.score > 0)
+          .sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return (b.page.ts || 0) - (a.page.ts || 0);
+          })
+          .slice(0, 50)
+          .map(x => x.page);
+        renderResults(results, q);
+      };
+      input.addEventListener('input', onInput);
+      // 自动聚焦提高体验
+      setTimeout(() => input.focus(), 200);
+    })();
+  </script>
+{{ end }}

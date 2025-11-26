@@ -1,0 +1,537 @@
+{{ $styles := resources.Get "css/main.css" | toCSS | minify | fingerprint }}
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+  {{ with site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+  <link rel="icon" href="{{ "/avatar.png" | relURL }}" type="image/png">
+  <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
+  {{ if .Params.math }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  {{ end }}
+</head>
+<body class="no-js">
+  <header class="site-header">
+    <div class="brand">
+      <a href="{{ "/" | relURL }}">{{ site.Title }}</a>
+      {{ with site.Params.description }}<p class="tagline">{{ . }}</p>{{ end }}
+    </div>
+    <div class="header-actions">
+      {{ if not .IsHome }}
+        <button class="back-btn" id="backBtn" aria-label="返回上一级" type="button">
+          <span aria-hidden="true">←</span>
+          <span class="back-label">返回</span>
+        </button>
+      {{ end }}
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">☀️</button>
+      {{ $searchMenu := where site.Menus.main "Name" "==" "搜索" }}
+      {{ with index $searchMenu 0 }}
+        <a href="{{ .URL }}" class="search-icon"
+           aria-label="搜索">
+          <span aria-hidden="true">🔍</span>
+          <span class="sr-only">搜索</span>
+        </a>
+      {{ end }}
+      <nav class="site-nav">
+        {{ range site.Menus.main }}
+          {{ if ne .Name "搜索" }}
+            <a href="{{ .URL }}" {{ if $.IsMenuCurrent "main" . }}aria-current="page"{{ end }}>{{ .Name }}</a>
+          {{ end }}
+        {{ end }}
+      </nav>
+    </div>
+  </header>
+  <div class="reading-progress" aria-hidden="true">
+    <div class="reading-progress-bar" id="readingProgressBar"></div>
+  </div>
+  <main class="site-main">
+    {{ block "main" . }}{{ end }}
+  </main>
+  <button class="back-top" id="backTopBtn" type="button" aria-label="回到顶部">↑</button>
+  <footer class="site-footer">
+    <p>© {{ now.Format "2006" }} CodeAlan · Powered by Hugo</p>
+    <p><a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">粤ICP备2023012271号-1</a></p>
+  </footer>
+  {{ if .Params.math }}
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  {{ end }}
+  <script>
+    (function() {
+      const root = document.documentElement;
+      const body = document.body;
+      const toggle = document.getElementById('themeToggle');
+      const storageKey = 'theme';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem(storageKey);
+      const initial = saved || (prefersDark ? 'dark' : 'light');
+      const apply = (mode) => {
+        if (mode === 'dark') {
+          root.classList.add('dark');
+          toggle.textContent = '🌙';
+        } else {
+          root.classList.remove('dark');
+          toggle.textContent = '☀️';
+        }
+        localStorage.setItem(storageKey, mode);
+      };
+      body.classList.remove('no-js');
+      apply(initial);
+      toggle.addEventListener('click', () => {
+        const next = root.classList.contains('dark') ? 'light' : 'dark';
+        apply(next);
+      });
+    })();
+    (function() {
+      const isTypingTarget = (el) => {
+        if (!el) return false;
+        const tag = el.tagName;
+        const editable = el.isContentEditable;
+        return editable ||
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT';
+      };
+      document.addEventListener('keydown', (e) => {
+        if (e.defaultPrevented) return;
+        if (isTypingTarget(e.target)) return;
+        if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.altKey) {
+          const search = document.getElementById('searchInput');
+          if (search) {
+            e.preventDefault();
+            search.focus();
+            search.select();
+          } else {
+            window.location.href = '{{ "/search/" | relURL }}';
+          }
+        }
+        if (e.key === 't' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        if ((e.key === 'j' || e.key === 'k') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          const prev = document.querySelector('.post-nav-link.prev');
+          const next = document.querySelector('.post-nav-link.next');
+          if (e.key === 'j' && next) {
+            window.location.href = next.getAttribute('href');
+          } else if (e.key === 'k' && prev) {
+            window.location.href = prev.getAttribute('href');
+          }
+        }
+      });
+    })();
+    (function() {
+      const backBtn = document.getElementById('backBtn');
+      if (!backBtn) return;
+      backBtn.addEventListener('click', () => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = '{{ "/" | relURL }}';
+        }
+      });
+    })();
+    (function() {
+      const buttons = document.querySelectorAll('.copy-btn');
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const pre = btn.nextElementSibling;
+          if (!pre) return;
+          const codeEl = pre.querySelector('code') || pre;
+          const text = codeEl.textContent;
+          const write = navigator.clipboard && navigator.clipboard.writeText
+            ? navigator.clipboard.writeText(text)
+            : Promise.reject();
+          write.then(() => {
+            btn.textContent = '已复制';
+            setTimeout(() => (btn.textContent = '复制'), 1200);
+          }).catch(() => {
+            try {
+              const textarea = document.createElement('textarea');
+              textarea.value = text;
+              document.body.appendChild(textarea);
+              textarea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textarea);
+              btn.textContent = '已复制';
+              setTimeout(() => (btn.textContent = '复制'), 1200);
+            } catch (e) {}
+          });
+        });
+      });
+    })();
+    (function() {
+      const article = document.querySelector('.post .content');
+      if (!article) return;
+      const headings = article.querySelectorAll('h2[id], h3[id], h4[id]');
+      headings.forEach((h) => {
+        const id = h.id;
+        if (!id) return;
+        const anchor = document.createElement('button');
+        anchor.type = 'button';
+        anchor.className = 'heading-anchor';
+        anchor.textContent = '#';
+        anchor.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const url = window.location.origin + window.location.pathname + '#' + id;
+          const write = navigator.clipboard && navigator.clipboard.writeText
+            ? navigator.clipboard.writeText(url)
+            : Promise.reject();
+          write.then(() => {
+            anchor.textContent = '已复制';
+            setTimeout(() => (anchor.textContent = '#'), 1200);
+          }).catch(() => {
+            try {
+              const textarea = document.createElement('textarea');
+              textarea.value = url;
+              document.body.appendChild(textarea);
+              textarea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textarea);
+              anchor.textContent = '已复制';
+              setTimeout(() => (anchor.textContent = '#'), 1200);
+            } catch (e) {}
+          });
+        });
+        h.appendChild(anchor);
+      });
+    })();
+    (function() {
+      const btn = document.getElementById('postShareBtn');
+      if (!btn || typeof window === 'undefined') return;
+      btn.addEventListener('click', () => {
+        const url = window.location.href;
+        const write = navigator.clipboard && navigator.clipboard.writeText
+          ? navigator.clipboard.writeText(url)
+          : Promise.reject();
+        write.then(() => {
+          btn.textContent = '已复制链接';
+          setTimeout(() => (btn.textContent = '复制本页链接'), 1200);
+        }).catch(() => {
+          try {
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            btn.textContent = '已复制链接';
+            setTimeout(() => (btn.textContent = '复制本页链接'), 1200);
+          } catch (e) {}
+        });
+      });
+    })();
+    (function() {
+      const btn = document.getElementById('postPptBtn');
+      if (!btn) return;
+      const content = document.querySelector('.post .content');
+      if (!content) return;
+      btn.addEventListener('click', () => {
+        const blocks = Array.from(content.children);
+        const slides = [];
+        let current = null;
+        blocks.forEach((node) => {
+          if (node.matches && node.matches('h2, h3')) {
+            current = { title: node.textContent || '', nodes: [] };
+            slides.push(current);
+          } else if (current) {
+            current.nodes.push(node.cloneNode(true));
+          }
+        });
+        if (!slides.length) {
+          current = { title: document.title, nodes: [content.cloneNode(true)] };
+          slides.push(current);
+        }
+        const overlay = document.createElement('div');
+        overlay.className = 'ppt-overlay';
+        overlay.dataset.pptActive = 'true';
+        const header = document.createElement('div');
+        header.className = 'ppt-header';
+        const titleEl = document.createElement('div');
+        titleEl.textContent = document.title;
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'ppt-btn';
+        closeBtn.textContent = '退出';
+        header.appendChild(titleEl);
+        header.appendChild(closeBtn);
+        const body = document.createElement('div');
+        body.className = 'ppt-body';
+        const footer = document.createElement('div');
+        footer.className = 'ppt-footer';
+        const hint = document.createElement('div');
+        hint.textContent = '← / → 切换上一页/下一页 · Esc 退出';
+        const controls = document.createElement('div');
+        controls.className = 'ppt-controls';
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'ppt-btn';
+        prevBtn.textContent = '上一页';
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'ppt-btn';
+        nextBtn.textContent = '下一页';
+        controls.appendChild(prevBtn);
+        controls.appendChild(nextBtn);
+        footer.appendChild(hint);
+        footer.appendChild(controls);
+        overlay.appendChild(header);
+        overlay.appendChild(body);
+        overlay.appendChild(footer);
+        const slideEls = slides.map((slide, idx) => {
+          const el = document.createElement('div');
+          el.className = 'ppt-slide';
+          const h = document.createElement('h2');
+          h.textContent = slide.title || ('Slide ' + (idx + 1));
+          el.appendChild(h);
+          slide.nodes.forEach((node) => el.appendChild(node));
+          body.appendChild(el);
+          return el;
+        });
+        let index = 0;
+        const update = () => {
+          slideEls.forEach((el, i) => {
+            el.classList.toggle('is-active', i === index);
+          });
+        };
+        const cleanup = () => {
+          if (overlay.parentNode) {
+            document.body.removeChild(overlay);
+          }
+          document.removeEventListener('keydown', onKey);
+        };
+        const onKey = (e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            cleanup();
+          } else if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+            e.preventDefault();
+            if (index < slideEls.length - 1) {
+              index += 1;
+              update();
+            }
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            if (index > 0) {
+              index -= 1;
+              update();
+            }
+          }
+        };
+        prevBtn.addEventListener('click', () => {
+          if (index > 0) {
+            index -= 1;
+            update();
+          }
+        });
+        nextBtn.addEventListener('click', () => {
+          if (index < slideEls.length - 1) {
+            index += 1;
+            update();
+          }
+        });
+        closeBtn.addEventListener('click', cleanup);
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(overlay);
+        index = 0;
+        update();
+      });
+    })();
+    (function() {
+      const article = document.querySelector('.post .content');
+      if (!article) return;
+      const imgs = article.querySelectorAll('img');
+      if (!imgs.length) return;
+      imgs.forEach((img) => {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', () => {
+          if (img.dataset.noLightbox === 'true') return;
+          const overlay = document.createElement('div');
+          overlay.className = 'lightbox-overlay';
+          const big = document.createElement('img');
+          big.src = img.src;
+          big.alt = img.alt || '';
+          overlay.appendChild(big);
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+              document.body.removeChild(overlay);
+            }
+          });
+          document.addEventListener('keydown', function onKey(ev) {
+            if (ev.key === 'Escape') {
+              if (overlay.parentNode) {
+                document.body.removeChild(overlay);
+              }
+              document.removeEventListener('keydown', onKey);
+            }
+          });
+          document.body.appendChild(overlay);
+        });
+      });
+    })();
+    (function() {
+      const el = document.querySelector('.view-count');
+      if (!el || typeof window === 'undefined' || !window.localStorage) return;
+      const key = el.getAttribute('data-key') || window.location.pathname;
+      const storageKey = 'views:' + key;
+      let count = 0;
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) count = parseInt(raw, 10) || 0;
+      } catch (e) {}
+      count += 1;
+      el.textContent = count;
+      try {
+        localStorage.setItem(storageKey, String(count));
+      } catch (e) {}
+    })();
+    (function() {
+      const article = document.querySelector('.post');
+      const bar = document.getElementById('readingProgressBar');
+      if (!article || !bar) return;
+      const update = () => {
+        const rect = article.getBoundingClientRect();
+        const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+        const total = article.offsetHeight - viewHeight;
+        if (total <= 0) {
+          bar.style.width = '0%';
+          return;
+        }
+        const scrolled = Math.min(Math.max(-rect.top, 0), total);
+        const percent = (scrolled / total) * 100;
+        bar.style.width = percent + '%';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+    (function() {
+      const toc = document.querySelector('.toc');
+      const article = document.querySelector('.post .content');
+      if (!toc || !article) return;
+      const links = Array.from(toc.querySelectorAll('a[href^="#"]'));
+      // 折叠/展开支持
+      toc.querySelectorAll('li').forEach((li) => {
+        const sub = li.querySelector('ul');
+        const link = li.querySelector('a');
+        if (!sub || !link) return;
+        li.classList.add('has-children');
+      });
+      const headings = links
+        .map((link) => {
+          const id = decodeURIComponent(link.getAttribute('href').slice(1));
+          const h = article.querySelector('#' + CSS.escape(id));
+          return h ? { el: h, link } : null;
+        })
+        .filter(Boolean);
+      if (!headings.length) return;
+      const setActive = (targetLink) => {
+        links.forEach((a) => a.classList.toggle('is-active', a === targetLink));
+      };
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            let best = null;
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                if (!best || entry.target.offsetTop < best.target.offsetTop) {
+                  best = entry;
+                }
+              }
+            });
+            if (best) {
+              const id = best.target.id;
+              const match = headings.find((h) => h.el.id === id);
+              if (match) setActive(match.link);
+            }
+          },
+          {
+            rootMargin: '0px 0px -65%',
+            threshold: [0, 1],
+          }
+        );
+        headings.forEach(({ el }) => observer.observe(el));
+      } else {
+        const onScroll = () => {
+          const top = window.scrollY || window.pageYOffset;
+          let current = headings[0];
+          headings.forEach((h) => {
+            if (h.el.offsetTop - 80 <= top) current = h;
+          });
+          setActive(current.link);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    })();
+    (function() {
+      const article = document.querySelector('.post .content');
+      if (!article) return;
+      const pdfLinks = article.querySelectorAll('a[href$=".pdf"]');
+      pdfLinks.forEach((a) => {
+        a.target = '_blank';
+        a.rel = 'noreferrer noopener';
+        a.classList.add('pdf-link');
+      });
+    })();
+    (function() {
+      const blocks = document.querySelectorAll('.code-block');
+      if (!blocks.length) return;
+      blocks.forEach((block) => {
+        if (block.dataset.hasLangLabel === 'true') return;
+        const pre = block.querySelector('pre');
+        if (!pre) return;
+        const code = pre.querySelector('code');
+        let lang = '';
+        if (code) {
+          if (code.dataset && code.dataset.lang) {
+            lang = code.dataset.lang;
+          } else {
+            const cls = code.className || '';
+            const m = cls.match(/language-([^\s]+)/);
+            if (m) lang = m[1];
+          }
+        }
+        if (!lang) return;
+        let label = lang.toUpperCase();
+        if (lang.toLowerCase() === 'cpp' || lang.toLowerCase() === 'c++') label = 'C++';
+        if (lang.toLowerCase() === 'bash' || lang.toLowerCase() === 'sh' || lang.toLowerCase() === 'zsh') label = 'Bash';
+        if (lang.toLowerCase() === 'python') label = 'Python';
+        const badge = document.createElement('div');
+        badge.className = 'code-lang';
+        badge.textContent = label;
+        block.insertBefore(badge, pre);
+        block.dataset.hasLangLabel = 'true';
+      });
+    })();
+    (function() {
+      const btn = document.getElementById('backTopBtn');
+      if (!btn) return;
+      const threshold = 320;
+      const onScroll = () => {
+        const y = window.scrollY || window.pageYOffset;
+        const shouldShow = y > threshold;
+        btn.classList.toggle('is-visible', shouldShow);
+      };
+      btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
+    {{ if .Params.math }}
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false},
+        {left: "\\(", right: "\\)", display: false},
+        {left: "\\[", right: "\\]", display: true}
+      ],
+      throwOnError: false
+    });
+    {{ end }}
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{{/* 
+  根据 pre 内容判断是否是行号列：
+  - 含有 class="lnt" 的预格式块视为行号，只原样输出；
+  - 其他代码块包一层 .code-block，并添加复制按钮。
+*/}}
+{{ $raw := . }}
+{{ if in $raw "class=\"lnt\"" }}
+  {{ $raw | safeHTML }}
+{{ else }}
+  <div class="code-block">
+    <button class="copy-btn" type="button" aria-label="复制代码">复制</button>
+    {{ $raw | safeHTML }}
+  </div>
+{{ end }}
