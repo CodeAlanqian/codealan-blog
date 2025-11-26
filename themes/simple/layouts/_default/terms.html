@@ -31,7 +31,7 @@
         (function() {
           const container = document.getElementById('tagGraph');
           if (!container) return;
-          const pages = {{ $items | jsonify }};
+          const pages = JSON.parse({{ $items | jsonify }});
           const counts = {};
           const edges = {};
 
@@ -53,7 +53,10 @@
             }
           });
 
-          const nodes = Object.keys(counts).map(name => ({ id: name, count: counts[name] }));
+          const nodes = Object.keys(counts).map(name => ({
+            id: name,
+            count: counts[name]
+          }));
           if (!nodes.length) return;
           nodes.sort((a, b) => b.count - a.count);
           const maxNodes = 14;
@@ -76,57 +79,184 @@
 
           const centerX = width / 2;
           const centerY = height / 2;
-          const radius = Math.min(width, height) * 0.32;
 
-          const positions = {};
-          topNodes.forEach((node, i) => {
-            const angle = (2 * Math.PI * i) / topNodes.length - Math.PI / 2;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            positions[node.id] = { x, y };
-          });
+          // Initialize nodes with random positions around center
+          const simNodes = topNodes.map((n, i) => ({
+            id: n.id,
+            count: n.count,
+            x: centerX + (Math.random() - 0.5) * 80,
+            y: centerY + (Math.random() - 0.5) * 80,
+            vx: 0,
+            vy: 0
+          }));
+          const idToNode = new Map(simNodes.map(n => [n.id, n]));
 
-          const maxW = graphEdges.reduce((m, e) => Math.max(m, e.weight), 1);
-          graphEdges.forEach(edge => {
-            const s = positions[edge.source];
-            const t = positions[edge.target];
-            if (!s || !t) return;
+          const simEdges = graphEdges.map(e => ({
+            source: idToNode.get(e.source),
+            target: idToNode.get(e.target),
+            weight: e.weight
+          })).filter(e => e.source && e.target);
+
+          const maxW = simEdges.reduce((m, e) => Math.max(m, e.weight), 1);
+
+          // Create SVG elements
+          const edgeEls = simEdges.map(edge => {
             const line = document.createElementNS(svgNS, 'line');
-            line.setAttribute('x1', s.x);
-            line.setAttribute('y1', s.y);
-            line.setAttribute('x2', t.x);
-            line.setAttribute('y2', t.y);
+            line.setAttribute('class', 'tag-graph-edge');
             const w = 0.6 + (edge.weight / maxW) * 1.4;
             line.setAttribute('stroke-width', w.toFixed(2));
-            line.setAttribute('class', 'tag-graph-edge');
             svg.appendChild(line);
+            return line;
           });
 
-          topNodes.forEach(node => {
-            const pos = positions[node.id];
-            if (!pos) return;
+          const nodeEls = simNodes.map(node => {
             const g = document.createElementNS(svgNS, 'g');
             g.setAttribute('class', 'tag-graph-node');
 
             const circle = document.createElementNS(svgNS, 'circle');
-            circle.setAttribute('cx', pos.x);
-            circle.setAttribute('cy', pos.y);
-            circle.setAttribute('r', 12 + Math.min(node.count, 10));
             circle.setAttribute('class', 'tag-graph-circle');
+            circle.setAttribute('r', 12 + Math.min(node.count, 10));
             g.appendChild(circle);
 
             const label = document.createElementNS(svgNS, 'text');
-            label.setAttribute('x', pos.x);
-            label.setAttribute('y', pos.y + 4);
-            label.setAttribute('text-anchor', 'middle');
             label.setAttribute('class', 'tag-graph-label');
+            label.setAttribute('text-anchor', 'middle');
             label.textContent = node.id;
             g.appendChild(label);
 
             svg.appendChild(g);
+            return { g, circle, label };
           });
 
           container.appendChild(svg);
+
+          // Simple force-directed layout
+          const chargeStrength = -140;
+          const linkDistance = 90;
+          const linkStrength = 0.08;
+          const centerStrength = 0.03;
+          const damping = 0.9;
+
+          let dragging = null;
+
+          function tick() {
+            // Apply repulsion
+            for (let i = 0; i < simNodes.length; i++) {
+              for (let j = i + 1; j < simNodes.length; j++) {
+                const a = simNodes[i];
+                const b = simNodes[j];
+                let dx = b.x - a.x;
+                let dy = b.y - a.y;
+                let distSq = dx * dx + dy * dy || 0.01;
+                let force = chargeStrength / distSq;
+                const dist = Math.sqrt(distSq);
+                dx /= dist;
+                dy /= dist;
+                a.vx += force * dx;
+                a.vy += force * dy;
+                b.vx -= force * dx;
+                b.vy -= force * dy;
+              }
+            }
+
+            // Apply spring forces
+            simEdges.forEach(edge => {
+              const a = edge.source;
+              const b = edge.target;
+              let dx = b.x - a.x;
+              let dy = b.y - a.y;
+              let dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+              const diff = dist - linkDistance;
+              const force = linkStrength * diff;
+              dx /= dist;
+              dy /= dist;
+              const fx = force * dx;
+              const fy = force * dy;
+              a.vx += fx;
+              a.vy += fy;
+              b.vx -= fx;
+              b.vy -= fy;
+            });
+
+            // Apply centering force and integrate
+            simNodes.forEach(node => {
+              if (dragging === node) return;
+              node.vx += (centerX - node.x) * centerStrength;
+              node.vy += (centerY - node.y) * centerStrength;
+              node.vx *= damping;
+              node.vy *= damping;
+              node.x += node.vx;
+              node.y += node.vy;
+            });
+
+            // Update SVG positions
+            simEdges.forEach((edge, i) => {
+              const line = edgeEls[i];
+              const a = edge.source;
+              const b = edge.target;
+              line.setAttribute('x1', a.x);
+              line.setAttribute('y1', a.y);
+              line.setAttribute('x2', b.x);
+              line.setAttribute('y2', b.y);
+            });
+
+            simNodes.forEach((node, i) => {
+              const { circle, label } = nodeEls[i];
+              circle.setAttribute('cx', node.x);
+              circle.setAttribute('cy', node.y);
+              label.setAttribute('x', node.x);
+              label.setAttribute('y', node.y + 4);
+            });
+
+            requestAnimationFrame(tick);
+          }
+
+          // Drag interaction
+          svg.addEventListener('mousedown', (e) => {
+            const pt = svg.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const local = pt.matrixTransform(svg.getScreenCTM().inverse());
+            const x = local.x;
+            const y = local.y;
+
+            let hit = null;
+            simNodes.forEach((node, i) => {
+              const r = 12 + Math.min(node.count, 10);
+              const dx = node.x - x;
+              const dy = node.y - y;
+              if (!hit && dx * dx + dy * dy <= r * r + 4) {
+                hit = node;
+              }
+            });
+            if (hit) {
+              dragging = hit;
+              dragging.vx = 0;
+              dragging.vy = 0;
+            }
+          });
+
+          svg.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            const pt = svg.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const local = pt.matrixTransform(svg.getScreenCTM().inverse());
+            dragging.x = local.x;
+            dragging.y = local.y;
+            dragging.vx = 0;
+            dragging.vy = 0;
+          });
+
+          svg.addEventListener('mouseup', () => {
+            dragging = null;
+          });
+
+          svg.addEventListener('mouseleave', () => {
+            dragging = null;
+          });
+
+          tick();
         })();
       </script>
     </section>
