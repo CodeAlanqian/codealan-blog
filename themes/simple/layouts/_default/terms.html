@@ -79,6 +79,7 @@
 
           const centerX = width / 2;
           const centerY = height / 2;
+          const palette = ['#94a3b8', '#38bdf8', '#22c55e', '#f97316', '#a855f7', '#ef4444'];
 
           // Initialize nodes with random positions around center
           const simNodes = topNodes.map((n, i) => {
@@ -102,7 +103,6 @@
           })).filter(e => e.source && e.target);
 
           const maxW = simEdges.reduce((m, e) => Math.max(m, e.weight), 1);
-          const palette = ['#94a3b8', '#38bdf8', '#22c55e', '#f97316', '#a855f7', '#ef4444'];
 
           // Create SVG elements
           const edgeEls = simEdges.map(edge => {
