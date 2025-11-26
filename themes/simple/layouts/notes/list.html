@@ -1,0 +1,15 @@
+{{ define "main" }}
+  <article class="post">
+    <header class="post-header">
+      <h1>{{ .Title }}</h1>
+    </header>
+    <div class="post-body">
+      <div class="content">
+        {{ $html := .Content | replaceRE "(<pre[\\s\\S]*?</pre>)" (partial "code-block.html" "${1}") }}
+        {{ $html = $html | replaceRE "<img([^>]*?)>" "<img loading=\"lazy\"$1>" }}
+        {{ $html | safeHTML }}
+      </div>
+    </div>
+  </article>
+{{ end }}
+
