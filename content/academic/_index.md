@@ -166,7 +166,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 - GitHub：<https://github.com/CodeAlanqian>  
 - B 站主页：<https://space.bilibili.com/352156963>  
 
-若对上述研究方向有兴趣，或有潜在合作与交流的想法，欢迎通过邮件或 B 站私信联系。
+**若对上述研究方向有兴趣，或有潜在合作与交流的想法，欢迎通过邮件联系。**
 
 ### 证书与奖励（部分）
 
