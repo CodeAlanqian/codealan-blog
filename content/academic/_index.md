@@ -71,9 +71,9 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### Contact
 
-- Email: `codealan@qq.com`  
-- GitHub: https://github.com/CodeAlanqian  
-- Bilibili: https://space.bilibili.com/352156963  
+- Email: <a href="mailto:codealan@qq.com">codealan@qq.com</a>  
+- GitHub: <https://github.com/CodeAlanqian>  
+- Bilibili: <https://space.bilibili.com/352156963>  
 
 ---
 
@@ -141,7 +141,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### 联系方式
 
-- Email：`codealan@qq.com`  
+- Email：<a href="mailto:codealan@qq.com">codealan@qq.com</a>  
 - GitHub：<https://github.com/CodeAlanqian>  
 - B 站主页：<https://space.bilibili.com/352156963>  
 
