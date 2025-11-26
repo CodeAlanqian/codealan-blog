@@ -31,6 +31,29 @@
   - 标签统一使用 `data-tag-key`，根据领域自动上色（如 `vln` / `ros` / `docker` / `rl` / `llm` / `ubuntu` / `latex` / `habitat` 等）。  
   - 搜索结果页和文章卡片中的标签颜色保持一致。  
 
+## 个人 AI 助手（DeepSeek 代理）
+
+- 后端：  
+  - 根目录下 `ai_server.py` 使用 FastAPI + httpx 实现一个轻量代理服务，暴露接口：`POST /api/ai/chat`。  
+  - 通过环境变量 `DEEPSEEK_API_KEY` 读取 DeepSeek 的 API Key（不写入仓库，不在前端暴露）。  
+  - 请求转发到 `https://api.deepseek.com/v1/chat/completions`，使用 `deepseek-chat` 模型，兼容 OpenAI 风格。  
+- 前端：  
+  - 在所有页面右下角提供一个「个人 AI 助手」浮动按钮，点击展开聊天面板。  
+  - 面板支持多轮对话，默认向后端发送当前会话的所有 `messages`。  
+  - 对于调用失败，会在面板内显示友好的错误提示，不影响页面其它功能。  
+- 启动示例：  
+  ```bash
+  # 安装依赖（建议使用虚拟环境）
+  pip install fastapi uvicorn httpx
+
+  # 配置环境变量（请使用你自己的 Key）
+  export DEEPSEEK_API_KEY="your_deepseek_api_key"
+
+  # 启动本地代理服务
+  python ai_server.py  # 默认监听 127.0.0.1:9000
+  ```  
+  然后在 Nginx 中将 `/api/ai/` 转发到 `127.0.0.1:9000` 即可在正式站点使用。  
+
 ## 部署与 Nginx（摘要）
 
 > 详细部署过程参考服务器上的 Nginx 配置与 `agentdone.md`。

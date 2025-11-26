@@ -198,6 +198,60 @@
   - 在学术页顶部加入头像卡片（`/gyq.jpg`），作为学术 Profile 的视觉中心。  
   - 路由调整：  
     - 内容文件为 `content/academic/_index.md`，front matter 中声明 `url: "/academic/"`。  
+
+- 标签知识图谱（/tags/）  
+  - 在标签聚合页模板 `themes/simple/layouts/_default/terms.html` 中，基于全部文章的标签统计与共现关系构建简单图数据：  
+    - 统计每个标签出现次数，计算标签对在同一篇文章中同时出现的次数作为“边权”。  
+    - 取出现频率较高的前若干个标签（上限 14 个）作为节点，以共现为边构建图。  
+  - 在前端使用原生 SVG + 简易物理引擎绘制“标签知识图谱”：  
+    - 节点按标签名分配不同颜色与大小（频率越高越大），边颜色也根据端点组合映射，使连接关系更易区分。  
+    - 使用简单的力导向布局（斥力 + 弹簧 + 居中力 + 阻尼），尽量让节点分散、标签不互相遮挡。  
+    - 支持桌面端鼠标拖动、移动端触控拖动（使用 `touchstart/touchmove/touchend`，并通过 `passive: false` + `preventDefault` 避免滚动冲突）。  
+  - 样式定义在 `themes/simple/assets/css/main.css` 中的 `.tag-graph*` 相关类，包括卡片风格、SVG 宽度、自适应等。  
+
+- 个人 AI 助手（DeepSeek API 代理）  
+  - 需求：在博客中加入一个“个人 AI”辅助问答入口，但不能在前端暴露任何 API Key。  
+  - 后端实现：  
+    - 在仓库根目录新增 `ai_server.py`，使用 FastAPI + httpx 构建轻量代理服务：  
+      - 暴露 `POST /api/ai/chat`，请求体为 `{"messages": [{"role": "user"/"assistant"/"system", "content": "..."}]}`。  
+      - 服务端优先通过环境变量 `DEEPSEEK_API_KEY` 读取 DeepSeek Key，若未配置则尝试从项目根目录 `.env` 文件中解析同名变量。  
+      - `.env` 示例见 `.env.example`，真实 `.env` 文件已通过 `.gitignore` 忽略，不会进入仓库。  
+      - 若找到 Key，则转发到 `https://api.deepseek.com/v1/chat/completions`。  
+      - 默认使用 `deepseek-chat` 模型，参数包含 `temperature`、`max_tokens` 等，返回首个 `choices[0].message.content` 作为 `reply`。  
+      - 对网络错误或 DeepSeek 返回的错误状态进行捕获，转为 HTTP 5xx/502 错误，便于前端提示。  
+      - 在调用前构造了一个较详细的 `system` prompt，简要描述站点结构（学术页、备忘页、标签知识图谱等）、作者研究方向与项目背景，以及回答风格：  
+        - 自动跟随用户语言（中/英）。  
+        - 偏向技术、工程化和命令示例的回答方式。  
+        - 不捏造未描述的私人经历，对不确定部分明确说明并给出验证建议。  
+    - 启动方式示例：  
+      - `pip install fastapi uvicorn httpx`  
+      - 在根目录创建 `.env`，写入 `DEEPSEEK_API_KEY=your_deepseek_api_key`（或直接导出环境变量）。  
+      - `python ai_server.py` 或 `uvicorn ai_server:app --host 127.0.0.1 --port 9000`。  
+    - 部署建议：在 Nginx 中增加反向代理，将 `/api/ai/` 前缀转发到本机 9000 端口，确保浏览器始终只与同源接口交互。  
+    - 为运维方便，新增 `start_ai.sh`：  
+      - 启动前会查找并优雅关闭已有的 `ai_server.py` 进程（先 `SIGTERM`，必要时 `SIGKILL`），再以 `nohup python ai_server.py >> ai_log.log 2>&1 &` 方式后台重启。  
+      - 自动从 `.env` 中读取需要的环境变量。  
+      - 日志统一写入 `ai_log.log`，该文件已在 `.gitignore` 中忽略。  
+  - 前端集成：  
+    - 在 `themes/simple/layouts/partials/ai-chat.html` 中定义浮动聊天组件：  
+      - 右下角悬浮按钮（带「🤖 AI」字样），点击后弹出小型聊天面板。  
+      - 面板内包含对话区、输入框与发送按钮，支持多轮对话展示。  
+    - 在全局模板 `themes/simple/layouts/_default/baseof.html` 中引入该 partial，并添加前端逻辑：  
+      - 维护简单的 `history` 数组保存当前会话的 role/content 列表。  
+      - 发送时根据环境自动选择调用地址：  
+        - 本地预览（`localhost/127.0.0.1/0.0.0.0`）时，直接请求 `http://127.0.0.1:9000/api/ai/chat`。  
+        - 正式站点（`codealan.top`）时，请求 `/api/ai/chat`，由 Nginx 反向代理到本机 9000 端口。  
+      - 后端允许 `http://localhost:1313` 等来源（CORS）访问，便于本地开发调试。  
+      - 对响应中的 `reply` 追加到对话区，失败时在面板内显示错误提示而不打断其他功能。  
+      - 支持 `Enter` 发送、`Shift+Enter` 换行，并有“思考中…”状态提示。  
+    - 展示与样式：  
+      - 在 `themes/simple/layouts/_default/baseof.html` 中实现了一个轻量级 Markdown 渲染器，用于在 AI 回复中支持：  
+        - 标题（`#` 开头）、无序列表（`-` / `*`）、行内代码 `` `code` ``、代码块 ```lang```、粗体 `**text**` / `__text__`、超链接 `[text](url)` 等。  
+        - 所有用户输入先进行 HTML 转义，AI 回复则按上述规则解析为安全的 HTML 片段插入气泡。  
+      - 在 `themes/simple/assets/css/main.css` 中增加 `.ai-chat-*` 以及 `ai-chat-bubble` 内部元素的样式：  
+        - 段落、列表、代码块与行内代码均使用与站点其他代码块一致的字体与背景，保证阅读体验统一。  
+      - 在 `themes/simple/assets/css/main.css` 中增加 `.ai-chat-*` 类，统一圆角卡片、阴影、字体大小，使其与整体主题风格一致。  
+      - 保证与右下角“回到顶部”按钮不重叠，在移动端下自动缩放宽度以适配窄屏。  
     - `config.yaml` 菜单中“学术”指向 `/academic/`（不再使用 `/about/`）。  
 
 - B 站代表视频区  
