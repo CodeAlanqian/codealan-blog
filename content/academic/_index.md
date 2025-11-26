@@ -45,9 +45,23 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### Projects & Experience (Selected)
 
-- RoboMaster robot vision and control projects, including target detection, pose estimation, and strategy scheduling.  
-- Notes and small experiments around Embodied AI and VLN courses / papers (some being cleaned up into blog posts).  
-- Engineering practice on containerized and cloud-based environments (Nextcloud, ROS, LLM services) using Docker.
+- Provincial key Innovation & Entrepreneurship Project (undergraduate)  
+  *Multi-sensor fusion SLAM for UAV systems* (2022.12–2024.05)  
+  - Studied SLAM methods that fuse camera, LiDAR, IMU and other sensors for robust UAV localization.  
+  - Responsible for overall UAV system design, PX4+MAVROS+Gazebo+QGC simulation, physical platform integration, and host-side software (odometry, navigation, decision).  
+
+- RoboMaster University Series (RMU), VANGUARD Team (2021.10–present)  
+  - Co-founded and served as Vice Captain & vision/navigation lead.  
+  - Worked on auto-aiming, ballistic trajectory computation, and sentinel robot navigation/decision-making.  
+  - The open-sourced ballistic solver project on GitHub has received dozens of stars and is referenced by multiple university teams.  
+
+- National Undergraduate Intelligent Car Competition – Outdoor ROS Vehicle Race  
+  - 2022–2023: participated in two consecutive editions; in the 18th competition, the team achieved National First Prize (5th place).  
+  - Contributions include cone detection via OpenCV, 2D LiDAR mapping and navigation, fusion of vision and LiDAR for robust path following, and switching to TEB-based trajectory planning.  
+
+- Additional engineering practice  
+  - Notes and small experiments around Embodied AI and VLN courses / papers (some being cleaned up into blog posts).  
+  - Containerized and cloud-based environments (Nextcloud, ROS, LLM services) using Docker.
 
 ### Ongoing Directions
 
@@ -95,7 +109,25 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### 项目与实践（选摘）
 
-- RoboMaster 机器人视觉与控制相关项目：目标检测、姿态估计、策略调度等。  
+- 大学生创新创业训练项目（省级重点支持领域）  
+  *基于多传感器融合 SLAM 技术的无人机系统*（2022.12–2024.05）  
+  - 项目背景：单一传感器（相机 / 激光雷达 / IMU 等）在定位建图中各有局限，多传感器融合成为研究热点。  
+  - 负责工作：  
+    - 无人机整体系统框架设计；  
+    - PX4 + MAVROS + Gazebo + QGC 无人机仿真环境搭建；  
+    - 无人机平台搭建与集成；  
+    - 上位机里程计、导航与决策模块开发。  
+
+- RoboMaster 机甲大师高校系列赛（RMU）（2021.10–至今）  
+  - 负责共创并担任 VANGUARD 战队副队长，负责视觉与导航组工作。  
+  - 主要工作：自动瞄准系统、弹道解算、哨兵机器人导航与决策等。  
+  - 弹道解算项目已开源至 GitHub，获得数十个 Star，被多所高校队伍引用。  
+
+- 全国大学生智能汽车竞赛——室外 ROS 无人车竞速赛（2022.09–2023.12）  
+  - 第十八届：全国一等奖（全国第五名）。  
+  - 第十七届主要负责：OpenCV 锥桶识别、二维激光雷达建图与导航。  
+  - 第十八届主要负责：项目进度推进，融合视觉与雷达实现稳定寻路，将路径规划算法改为 TEB，并调试高速运动下 GMapping 建图稳定性。  
+
 - 具身智能与 VLN 相关课程、论文的阅读笔记与小规模实验（部分会整理为博客文章）。  
 - 围绕 Nextcloud、ROS、LLM 等服务的 Docker 部署与调试实践，侧重工程环境搭建与自动化。
 
@@ -114,6 +146,26 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 - B 站主页：<https://space.bilibili.com/352156963>  
 
 若对上述研究方向有兴趣，或有潜在合作与交流的想法，欢迎通过邮件或 B 站私信联系。
+
+### 证书与奖励（部分）
+
+- 2022 年华南师范大学优秀学生三等奖学金  
+- 2023 年华南师范大学优秀学生二等奖学金  
+- 2022 与 2023 年学生创新奖一等奖  
+- 工学部优秀共青团员与优秀共青团干部  
+
+### 科研竞赛（部分）
+
+- 全国大学生智能汽车竞赛室外 ROS 无人车竞速赛全国一等奖（全国第五）  
+- 全国大学生智能汽车竞赛全国二等奖（ROS 无人车竞速）  
+- 中国机器人及人工智能大赛全国二等奖  
+- RoboMaster 机甲大师高校联盟赛全国二等奖  
+
+### 实践经历
+
+- 2021.09–2022.06：华南师范大学 PIONEER 战队视觉组成员  
+- 2022.09–2024.06：创立 VANGUARD 战队并任副队长  
+- 2024.03–至今：互联网+ 项目《基于图像识别的发电场所自动巡检消防无人车》技术组成员  
 
 ---
 
