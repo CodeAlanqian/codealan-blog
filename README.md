@@ -9,6 +9,7 @@
   - `content/academic/_index.md`：学术主页（中英版 Profile、研究兴趣、教育经历、项目与方向、B 站代表视频）。  
   - `content/obsidian/`：从 Obsidian 同步的各类笔记（VLN / ROS_NOTE / Docker / Ubuntu / Latex / Zotero / Other 等）。  
   - `content/posts/`：常规博文与 Demo（例如 PDF 引用示例）。  
+   - `content/notes/_index.md`：运维与环境备忘（常用命令速查 + Bug&Pitfall 记事本）。  
   - `content/search/_index.md`、`content/archives/_index.md`：搜索页与归档页。  
 - 构建入口：  
   - `build.sh`：调用 `hugo` 生成静态文件到 `public/`。  

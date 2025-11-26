@@ -247,3 +247,26 @@
   - 之后通过 `git push -f origin master` 覆盖远程 `master` 历史，GitHub 仓库的历史中不再包含大文件。  
 
 > 当前推荐工作流：只提交源码与内容（`content/`、`layouts/`、`themes/`、脚本等），在服务器本地运行 `./build.sh` 生成 `public/` 用于 Nginx 部署；PDF 与其他大资产通过 `static/obsidian` 或外链管理，避免纳入 git 历史。  
+
+---
+
+## 运维备忘页（/notes/）
+
+- 新增 `content/notes/_index.md`，作为“运维备忘 & 坑点记录”：  
+  - **一页记：常用命令速查**  
+    - Docker：查看容器/镜像、容器生命周期、清理无用资源等命令。  
+    - tmux：会话管理、基础快捷键。  
+    - Git：日常提交与简单回退操作。  
+    - Nginx：配置检查、重载/重启与日志查看。  
+    - acme.sh：证书列出、签发与续期示例。  
+  - **Bug & Pitfall 记事本**  
+    - Hugo / 静态资源：避免提交 `public/` 与大 PDF 的策略说明。  
+    - Nginx / stream 分流：443 端口复用、`stream` + `ssl_preread` 使用要点。  
+    - Docker / GPU 环境：`nvidia-smi` 检查与 `--gpus all` 示例。  
+    - 终端 & tmux：字体与 locale 相关的显示问题记录。  
+
+- 模板与样式  
+  - 为 `notes` section 新增模板 `themes/simple/layouts/notes/list.html`：  
+    - 使用与单篇文章一致的 `.post` + `.content` 布局。  
+    - 同样对 `<pre>` 使用 `code-block` 包装，继承代码高亮、复制按钮等样式。  
+  - 确保 `/notes/` 页面中的所有命令与配置片段都以标准 Markdown 代码块呈现，视觉与功能与普通文章保持一致。  
