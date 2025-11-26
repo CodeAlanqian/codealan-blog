@@ -531,6 +531,47 @@ a {
   gap: 6px;
 }
 
+.tag-graph {
+  margin-top: 28px;
+  padding: 16px 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.tag-graph h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.tag-graph-hint {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.tag-graph-svg {
+  width: 100%;
+  max-width: 480px;
+  display: block;
+  margin: 0 auto;
+}
+
+.tag-graph-edge {
+  stroke: rgba(148, 163, 184, 0.6);
+}
+
+.tag-graph-circle {
+  fill: rgba(59, 130, 246, 0.16);
+  stroke: rgba(37, 99, 235, 0.7);
+  stroke-width: 1.2;
+}
+
+.tag-graph-label {
+  font-size: 11px;
+  fill: var(--text);
+}
+
 .tag-count {
   min-width: 20px;
   height: 20px;

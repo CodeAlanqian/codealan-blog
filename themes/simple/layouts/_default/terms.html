@@ -15,4 +15,120 @@
       </a>
     {{ end }}
   </section>
+  {{ if $isTag }}
+    {{/* 构造简单的标签共现数据，供前端绘制知识图谱使用 */}}
+    {{- $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") -}}
+    {{- $items := slice -}}
+    {{- range $p := $pages -}}
+      {{- $obj := dict "tags" ($p.Params.tags | default (slice)) -}}
+      {{- $items = $items | append $obj -}}
+    {{- end -}}
+    <section class="tag-graph">
+      <h2>标签知识图谱</h2>
+      <p class="tag-graph-hint">根据文章中标签共现关系绘制，仅展示出现频率较高的部分标签。</p>
+      <div id="tagGraph"></div>
+      <script>
+        (function() {
+          const container = document.getElementById('tagGraph');
+          if (!container) return;
+          const pages = {{ $items | jsonify }};
+          const counts = {};
+          const edges = {};
+
+          pages.forEach(p => {
+            const tags = Array.from(new Set((p.tags || []).map(t => (t || '').toString().toLowerCase())));
+            if (tags.length < 1) return;
+            tags.forEach(t => {
+              if (!t) return;
+              counts[t] = (counts[t] || 0) + 1;
+            });
+            for (let i = 0; i < tags.length; i++) {
+              for (let j = i + 1; j < tags.length; j++) {
+                const a = tags[i];
+                const b = tags[j];
+                if (!a || !b) continue;
+                const key = a < b ? a + '|' + b : b + '|' + a;
+                edges[key] = (edges[key] || 0) + 1;
+              }
+            }
+          });
+
+          const nodes = Object.keys(counts).map(name => ({ id: name, count: counts[name] }));
+          if (!nodes.length) return;
+          nodes.sort((a, b) => b.count - a.count);
+          const maxNodes = 14;
+          const topNodes = nodes.slice(0, maxNodes);
+          const nodeIndex = new Map(topNodes.map((n, i) => [n.id, i]));
+
+          const graphEdges = [];
+          Object.keys(edges).forEach(key => {
+            const [a, b] = key.split('|');
+            if (!nodeIndex.has(a) || !nodeIndex.has(b)) return;
+            graphEdges.push({ source: a, target: b, weight: edges[key] });
+          });
+
+          const width = 420;
+          const height = 360;
+          const svgNS = 'http://www.w3.org/2000/svg';
+          const svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+          svg.setAttribute('class', 'tag-graph-svg');
+
+          const centerX = width / 2;
+          const centerY = height / 2;
+          const radius = Math.min(width, height) * 0.32;
+
+          const positions = {};
+          topNodes.forEach((node, i) => {
+            const angle = (2 * Math.PI * i) / topNodes.length - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            positions[node.id] = { x, y };
+          });
+
+          const maxW = graphEdges.reduce((m, e) => Math.max(m, e.weight), 1);
+          graphEdges.forEach(edge => {
+            const s = positions[edge.source];
+            const t = positions[edge.target];
+            if (!s || !t) return;
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', s.x);
+            line.setAttribute('y1', s.y);
+            line.setAttribute('x2', t.x);
+            line.setAttribute('y2', t.y);
+            const w = 0.6 + (edge.weight / maxW) * 1.4;
+            line.setAttribute('stroke-width', w.toFixed(2));
+            line.setAttribute('class', 'tag-graph-edge');
+            svg.appendChild(line);
+          });
+
+          topNodes.forEach(node => {
+            const pos = positions[node.id];
+            if (!pos) return;
+            const g = document.createElementNS(svgNS, 'g');
+            g.setAttribute('class', 'tag-graph-node');
+
+            const circle = document.createElementNS(svgNS, 'circle');
+            circle.setAttribute('cx', pos.x);
+            circle.setAttribute('cy', pos.y);
+            circle.setAttribute('r', 12 + Math.min(node.count, 10));
+            circle.setAttribute('class', 'tag-graph-circle');
+            g.appendChild(circle);
+
+            const label = document.createElementNS(svgNS, 'text');
+            label.setAttribute('x', pos.x);
+            label.setAttribute('y', pos.y + 4);
+            label.setAttribute('text-anchor', 'middle');
+            label.setAttribute('class', 'tag-graph-label');
+            label.textContent = node.id;
+            g.appendChild(label);
+
+            svg.appendChild(g);
+          });
+
+          container.appendChild(svg);
+        })();
+      </script>
+    </section>
+  {{ end }}
 {{ end }}
