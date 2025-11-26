@@ -211,24 +211,31 @@
             requestAnimationFrame(tick);
           }
 
-          // Drag interaction
-          svg.addEventListener('mousedown', (e) => {
-            const pt = svg.createSVGPoint();
-            pt.x = e.clientX;
-            pt.y = e.clientY;
-            const local = pt.matrixTransform(svg.getScreenCTM().inverse());
-            const x = local.x;
-            const y = local.y;
-
+          function findHitNode(x, y) {
             let hit = null;
-            simNodes.forEach((node, i) => {
-              const r = 12 + Math.min(node.count, 10);
+            simNodes.forEach((node) => {
+              const r = 10 + Math.min(node.count, 8);
               const dx = node.x - x;
               const dy = node.y - y;
-              if (!hit && dx * dx + dy * dy <= r * r + 4) {
+              if (!hit && dx * dx + dy * dy <= r * r + 6) {
                 hit = node;
               }
             });
+            return hit;
+          }
+
+          function toLocal(svg, clientX, clientY) {
+            const pt = svg.createSVGPoint();
+            pt.x = clientX;
+            pt.y = clientY;
+            const local = pt.matrixTransform(svg.getScreenCTM().inverse());
+            return { x: local.x, y: local.y };
+          }
+
+          // Drag interaction (mouse + touch)
+          svg.addEventListener('mousedown', (e) => {
+            const local = toLocal(svg, e.clientX, e.clientY);
+            const hit = findHitNode(local.x, local.y);
             if (hit) {
               dragging = hit;
               dragging.vx = 0;
@@ -238,10 +245,7 @@
 
           svg.addEventListener('mousemove', (e) => {
             if (!dragging) return;
-            const pt = svg.createSVGPoint();
-            pt.x = e.clientX;
-            pt.y = e.clientY;
-            const local = pt.matrixTransform(svg.getScreenCTM().inverse());
+            const local = toLocal(svg, e.clientX, e.clientY);
             dragging.x = local.x;
             dragging.y = local.y;
             dragging.vx = 0;
@@ -253,6 +257,38 @@
           });
 
           svg.addEventListener('mouseleave', () => {
+            dragging = null;
+          });
+
+          svg.addEventListener('touchstart', (e) => {
+            if (!e.touches || e.touches.length === 0) return;
+            const t = e.touches[0];
+            const local = toLocal(svg, t.clientX, t.clientY);
+            const hit = findHitNode(local.x, local.y);
+            if (hit) {
+              dragging = hit;
+              dragging.vx = 0;
+              dragging.vy = 0;
+              e.preventDefault();
+            }
+          }, { passive: false });
+
+          svg.addEventListener('touchmove', (e) => {
+            if (!dragging || !e.touches || e.touches.length === 0) return;
+            const t = e.touches[0];
+            const local = toLocal(svg, t.clientX, t.clientY);
+            dragging.x = local.x;
+            dragging.y = local.y;
+            dragging.vx = 0;
+            dragging.vy = 0;
+            e.preventDefault();
+          }, { passive: false });
+
+          svg.addEventListener('touchend', () => {
+            dragging = null;
+          });
+
+          svg.addEventListener('touchcancel', () => {
             dragging = null;
           });
 
