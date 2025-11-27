@@ -2597,7 +2597,6 @@ a {
     font-size: 0.84em;
     line-height: 1.35;
     max-width: 100%;
-    max-height: 320px;
     box-sizing: border-box;
     overflow: auto;
   }
@@ -2677,5 +2676,14 @@ a {
   .card {
     box-shadow: none !important;
     border-color: #e5e7eb;
+  }
+
+  .code-block.collapsed pre {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .code-toggle {
+    display: none !important;
   }
 }
