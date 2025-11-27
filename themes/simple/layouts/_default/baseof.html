@@ -5,7 +5,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
-  {{ with site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+  {{/* 动态描述：优先页面，其次摘要，最后站点描述 */}}
+  {{- $desc := "" -}}
+  {{- with .Description -}}
+    {{- $desc = . -}}
+  {{- else -}}
+    {{- with .Summary -}}
+      {{- $desc = . | plainify | truncate 160 -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $desc -}}
+    {{- with site.Params.description -}}
+      {{- $desc = . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $desc }}<meta name="description" content="{{ $desc }}">{{ end }}
+  {{- with .Params.tags }}
+    <meta name="keywords" content="{{ delimit . ", " }}">
+  {{- end }}
+  {{- $canonical := .Permalink -}}
+  {{- if .IsHome -}}
+    {{- $canonical = site.BaseURL -}}
+  {{- end -}}
+  <link rel="canonical" href="{{ $canonical }}">
+  {{- $image := "" -}}
+  {{- with .Params.cover -}}
+    {{- $image = . | relURL | absURL -}}
+  {{- else -}}
+    {{- with .Resources.ByType "image" -}}
+      {{- with .GetMatch "*" -}}
+        {{- $image = .RelPermalink | absURL -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $image -}}
+    {{- $imgs := findRE "<img[^>]+src=\\\"([^\\\"]+)\\\"" .Content 1 -}}
+    {{- if gt (len $imgs) 0 -}}
+      {{- $m := index $imgs 0 -}}
+      {{- $srcMatch := findRE "src=\\\"([^\\\"]+)\\\"" $m 1 -}}
+      {{- if gt (len $srcMatch) 0 -}}
+        {{- $raw := index $srcMatch 0 -}}
+        {{- $src := replace (replace $raw "src=\"" "") "\"" "" -}}
+        {{- $image = $src | relURL | absURL -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $image -}}
+    {{- $image = "/avatar.png" | relURL | absURL -}}
+  {{- end -}}
+  <meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+  <meta property="og:site_name" content="{{ site.Title }}">
+  <meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}">
+  {{- if $desc }}<meta property="og:description" content="{{ $desc }}">{{ end }}
+  <meta property="og:url" content="{{ $canonical }}">
+  <meta property="og:image" content="{{ $image }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}">
+  {{- if $desc }}<meta name="twitter:description" content="{{ $desc }}">{{ end }}
+  <meta name="twitter:image" content="{{ $image }}">
+  {{ if .IsHome }}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Yiqian Gong",
+      "alternateName": "CodeAlan",
+      "url": "{{ site.BaseURL }}",
+      "sameAs": [
+        "https://github.com/CodeAlanqian",
+        "https://space.bilibili.com/352156963"
+      ]
+    }
+    </script>
+  {{ end }}
   <link rel="icon" href="{{ "/avatar.png" | relURL }}" type="image/png">
   <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
   {{ if .Params.math }}
