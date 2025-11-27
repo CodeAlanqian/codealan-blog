@@ -934,7 +934,7 @@ a {
 
 .archive-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
 }
 
@@ -969,6 +969,46 @@ a {
   margin: 2px 4px 0 0;
   border-radius: 999px;
   border: 1px solid var(--border);
+}
+
+.archive-stats-extra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.archive-top-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.archive-top-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 3px 0;
+}
+
+.archive-top-item a {
+  color: var(--accent);
+}
+
+.archive-top-item a:hover {
+  text-decoration: underline;
+}
+
+.archive-top-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.archive-top-empty {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .archive-year {

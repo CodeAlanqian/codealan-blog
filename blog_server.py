@@ -89,6 +89,11 @@ class LikeResponse(BaseModel):
     count: int
 
 
+class StatItem(BaseModel):
+    path: str
+    count: int
+
+
 _DB_LOCK = threading.Lock()
 _DB_PATH = Path(__file__).resolve().parent / "views.db"
 
@@ -307,6 +312,44 @@ async def get_like(path: str) -> LikeResponse:
     """
     count = _get_like_count(path)
     return LikeResponse(path=path, count=count)
+
+
+def _get_top_stats(table: str, limit: int = 5) -> List[StatItem]:
+    """
+    返回指定表（views/likes）中 count 最高的若干条记录。
+    """
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            cur = conn.cursor()
+            cur.execute(
+                f"SELECT path, count FROM {table} ORDER BY count DESC LIMIT ?",
+                (limit,),
+            )
+            rows = cur.fetchall()
+            return [StatItem(path=row[0], count=int(row[1])) for row in rows]
+        finally:
+            conn.close()
+
+
+@app.get("/api/stats/top-views", response_model=List[StatItem])
+async def top_views(limit: int = 5) -> List[StatItem]:
+    """
+    获取浏览量 Top N 的页面列表。
+    """
+    if limit <= 0:
+        limit = 5
+    return _get_top_stats("views", limit)
+
+
+@app.get("/api/stats/top-likes", response_model=List[StatItem])
+async def top_likes(limit: int = 5) -> List[StatItem]:
+    """
+    获取点赞数 Top N 的页面列表。
+    """
+    if limit <= 0:
+        limit = 5
+    return _get_top_stats("likes", limit)
 
 
 if __name__ == "__main__":

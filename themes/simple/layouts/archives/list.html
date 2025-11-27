@@ -24,13 +24,45 @@
         <p class="archive-stats-value">{{ len $byYear }}</p>
       </div>
       <div class="archive-stats-card">
-        {{ $topTags := first 6 (sort site.Taxonomies.tags "Count" "desc") }}
-        <p class="archive-stats-label">Top 标签</p>
-        <p class="archive-stats-tags">
-          {{ range $name, $term := $topTags }}
-            <span class="archive-stats-tag">{{ $name }}</span>
+        {{ $byMonth := $pages.GroupByDate "2006-01" }}
+        <p class="archive-stats-label">平均每月文章数</p>
+        <p class="archive-stats-value">{{ div (len $pages) (len $byMonth) }}</p>
+      </div>
+      <div class="archive-stats-card">
+        {{ $byYearFull := $pages.GroupByDate "2006" }}
+        {{ $maxYear := "" }}
+        {{ $maxCount := 0 }}
+        {{ range $byYearFull }}
+          {{ if gt (len .Pages) $maxCount }}
+            {{ $maxYear = .Key }}
+            {{ $maxCount = len .Pages }}
           {{ end }}
-        </p>
+        {{ end }}
+        <p class="archive-stats-label">最高产年份</p>
+        <p class="archive-stats-value">{{ if $maxYear }}{{ $maxYear }}（{{ $maxCount }} 篇）{{ else }}—{{ end }}</p>
+      </div>
+      <div class="archive-stats-card">
+        {{ $byMonthFull := $pages.GroupByDate "2006-01" }}
+        {{ $maxMonthKey := "" }}
+        {{ $maxMonthCount := 0 }}
+        {{ range $byMonthFull }}
+          {{ if gt (len .Pages) $maxMonthCount }}
+            {{ $maxMonthKey = .Key }}
+            {{ $maxMonthCount = len .Pages }}
+          {{ end }}
+        {{ end }}
+        <p class="archive-stats-label">最高产月份</p>
+        <p class="archive-stats-value">{{ if $maxMonthKey }}{{ $maxMonthKey }}（{{ $maxMonthCount }} 篇）{{ else }}—{{ end }}</p>
+      </div>
+    </div>
+    <div class="archive-stats-extra">
+      <div class="archive-top-block">
+        <p class="archive-stats-label">阅读量 Top 5</p>
+        <ul class="archive-top-list" id="archiveTopViews"></ul>
+      </div>
+      <div class="archive-top-block">
+        <p class="archive-stats-label">点赞 Top 5</p>
+        <ul class="archive-top-list" id="archiveTopLikes"></ul>
       </div>
     </div>
   </section>
@@ -60,6 +92,13 @@
     {{ end }}
   </section>
   <script>
+    const ARCHIVE_PAGES = (function() {
+      {{- $items := slice -}}
+      {{- range $pages -}}
+        {{- $items = $items | append (dict "path" .RelPermalink "title" .Title) -}}
+      {{- end -}}
+      return {{ $items | jsonify }};
+    })();
     (function() {
       const years = document.querySelectorAll('.archive-year');
       years.forEach((year) => {
@@ -69,6 +108,41 @@
           year.classList.toggle('is-open');
         });
       });
+    })();
+    (function() {
+      const map = new Map();
+      (ARCHIVE_PAGES || []).forEach((p) => {
+        if (p && p.path) {
+          map.set(p.path, p.title || p.path);
+        }
+      });
+      const renderTop = (id, items) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!items || !items.length) {
+          el.innerHTML = '<li class="archive-top-empty">暂无数据</li>';
+          return;
+        }
+        const html = items.map((item) => {
+          const title = map.get(item.path) || item.path;
+          const safeTitle = title;
+          const href = item.path;
+          return '<li class="archive-top-item"><a href="' + href + '">' + safeTitle + '</a><span class="archive-top-count">' + item.count + '</span></li>';
+        }).join('');
+        el.innerHTML = html;
+      };
+      fetch('/api/stats/top-views?limit=5')
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data) renderTop('archiveTopViews', data);
+        })
+        .catch(() => {});
+      fetch('/api/stats/top-likes?limit=5')
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data) renderTop('archiveTopLikes', data);
+        })
+        .catch(() => {});
     })();
   </script>
 {{ end }}
