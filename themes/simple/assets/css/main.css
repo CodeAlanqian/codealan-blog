@@ -1864,7 +1864,7 @@ a {
 }
 
 .katex-display::-webkit-scrollbar {
-  height: 6px;
+  height: 4px;
 }
 
 .katex-display::-webkit-scrollbar-thumb {
