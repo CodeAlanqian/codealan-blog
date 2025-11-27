@@ -139,6 +139,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
     - PX4 + MAVROS + Gazebo + QGC 无人机仿真环境搭建；  
     - 无人机平台搭建与集成；  
     - 上位机里程计、导航与决策模块开发。  
+  - 对无人机系统与行业级无人机研制较为熟悉（含油电混动无人机），熟悉 ArduPilot / PX4 生态，并参与过无人机管控平台的设计与开发。  
 
 - RoboMaster 机甲大师高校系列赛（RMU）（2021.10–至今）  
   - 负责共创并担任 VANGUARD 战队副队长，负责视觉与导航组工作。  
