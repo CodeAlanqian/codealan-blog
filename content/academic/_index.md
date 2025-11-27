@@ -37,9 +37,9 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### Education
 
-- 2024–present · M.Eng. in Electronic Information  
+- 2025.09–present · M.Eng. in Electronic Information  
   National Academy of Engineering, SUSTech, China  
-- 2019–2023 · B.Eng. in Communication Engineering  
+- 2021.09–2025.06 · B.Eng. in Communication Engineering  
   South China Normal University (SCNU), China  
   · Vice Captain & Vision Group Leader, RoboMaster Team VANGUARD
 
