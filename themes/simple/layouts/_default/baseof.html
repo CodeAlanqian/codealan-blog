@@ -98,7 +98,6 @@
         </button>
       {{ end }}
       <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">☀️</button>
-      <button class="font-toggle" id="fontSizeToggle" aria-label="切换字号" type="button">A</button>
       {{ $searchMenu := where site.Menus.main "Name" "==" "搜索" }}
       {{ with index $searchMenu 0 }}
         <a href="{{ .URL }}" class="search-icon"
@@ -137,13 +136,11 @@
       const root = document.documentElement;
       const body = document.body;
       const toggle = document.getElementById('themeToggle');
-      const fontToggle = document.getElementById('fontSizeToggle');
       const storageKey = 'theme';
-      const fontKey = 'fontSize';
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const saved = localStorage.getItem(storageKey);
       const initial = saved || (prefersDark ? 'dark' : 'light');
-      const applyTheme = (mode) => {
+      const apply = (mode) => {
         if (mode === 'dark') {
           root.classList.add('dark');
           toggle.textContent = '🌙';
@@ -153,28 +150,12 @@
         }
         localStorage.setItem(storageKey, mode);
       };
-      const savedFont = localStorage.getItem(fontKey) || 'normal';
-      const applyFont = (mode) => {
-        if (mode === 'large') {
-          root.classList.add('font-large');
-        } else {
-          root.classList.remove('font-large');
-        }
-        localStorage.setItem(fontKey, mode);
-      };
       body.classList.remove('no-js');
-      applyTheme(initial);
-      applyFont(savedFont);
+      apply(initial);
       if (toggle) {
         toggle.addEventListener('click', () => {
           const next = root.classList.contains('dark') ? 'light' : 'dark';
-          applyTheme(next);
-        });
-      }
-      if (fontToggle) {
-        fontToggle.addEventListener('click', () => {
-          const isLarge = root.classList.contains('font-large');
-          applyFont(isLarge ? 'normal' : 'large');
+          apply(next);
         });
       }
     })();

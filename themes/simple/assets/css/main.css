@@ -49,15 +49,6 @@ a {
   text-decoration: none;
 }
 
-:root.font-large body {
-  font-size: 17px;
-  line-height: 1.8;
-}
-
-:root.font-large .post .content {
-  font-size: 17px;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -83,27 +74,6 @@ a {
   z-index: 10;
   width: 100%;
   box-sizing: border-box;
-}
-
-.font-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 6px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--muted);
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-}
-
-.font-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
 }
 
 .dark .site-header {
