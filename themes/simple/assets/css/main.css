@@ -343,6 +343,9 @@ a {
   .tagline {
     display: none;
   }
+  .bio-keywords-mobile {
+    display: block;
+  }
   .site-nav a {
     margin-left: 0;
     font-size: 16px;
@@ -499,6 +502,13 @@ a {
 .bio {
   margin: 0;
   color: var(--muted);
+}
+
+.bio-keywords-mobile {
+  display: none;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .bio a,
