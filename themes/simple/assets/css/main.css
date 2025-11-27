@@ -1873,7 +1873,7 @@ a {
 }
 
 .dark .katex-display::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.85);
+  background: rgba(56, 189, 248, 0.8);
 }
 
 @media (max-width: 640px) {
@@ -2474,7 +2474,7 @@ a {
 }
 
 .dark .content .code-block pre::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.85);
+  background: rgba(56, 189, 248, 0.8);
 }
 
 .pagination {
