@@ -1,7 +1,7 @@
 {{ define "main" }}
   {{ $pages := .Pages }}
   {{ if .IsHome }}
-    {{ $pages = where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
+    {{ $pages = where site.RegularPages "Section" "in" (slice "posts" "obsidian") }}
   {{ end }}
   <section class="hero">
     <h1>{{ .Title }}</h1>

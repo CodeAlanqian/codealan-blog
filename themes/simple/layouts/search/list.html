@@ -37,7 +37,7 @@
   </section>
   <script>
     const SEARCH_PAGES = (function() {
-      {{- $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") -}}
+      {{- $pages := where site.RegularPages "Section" "in" (slice "posts" "obsidian") -}}
       {{- $items := slice -}}
       {{- range $p := $pages -}}
         {{- $obj := dict

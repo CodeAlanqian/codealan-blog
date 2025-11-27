@@ -19,7 +19,7 @@
   </section>
   {{ if $isTag }}
     {{/* 构造简单的标签共现数据，供前端绘制知识图谱使用 */}}
-    {{- $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") -}}
+    {{- $pages := where site.RegularPages "Section" "in" (slice "posts" "obsidian") -}}
     {{- $items := slice -}}
     {{- range $p := $pages -}}
       {{- $obj := dict "tags" ($p.Params.tags | default (slice)) -}}

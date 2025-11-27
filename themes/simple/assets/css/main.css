@@ -1009,6 +1009,7 @@ a {
   gap: 10px;
   margin-bottom: 14px;
   align-items: center;
+   justify-content: center;
 }
 
 .post-like-btn,
