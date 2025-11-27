@@ -23,6 +23,7 @@
       </div>
     </section>
     {{/* 首页主打区域：展示最新若干篇文章的大卡片 */}}
+    <span class="view-count home-view-count" data-key="/" aria-hidden="true">0</span>
     {{ $ordered := $pages.ByDate.Reverse }}
     {{ $featured := first 2 $ordered }}
     {{ if gt (len $featured) 0 }}
