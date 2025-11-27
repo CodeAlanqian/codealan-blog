@@ -335,10 +335,10 @@ a {
     max-width: 360px;
   }
   .site-header {
-    padding: 2px 8px;
+    padding: 2px 6px;
   }
   .brand a {
-    font-size: 18px;
+    font-size: 16px;
   }
   .tagline {
     display: none;
@@ -353,7 +353,7 @@ a {
   }
   .site-nav a {
     margin-left: 0;
-    font-size: 16px;
+    font-size: 14px;
   }
 .theme-toggle,
 .search-icon {
