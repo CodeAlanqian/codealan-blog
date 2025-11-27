@@ -7,22 +7,31 @@
     <h1>{{ .Title }}</h1>
     {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
   </section>
-  <section class="profile">
-    <div class="avatar">
-      <img src="/avatar.png" alt="CodeAlan">
-    </div>
-    <div>
-      <h2 class="name">Hi 👋 This is 龚易乾 (Yiqian Gong, CodeAlan)</h2>
-      <p class="bio">
-        🎓 南方科技大学（SUSTech）电子信息硕士在读，研究方向：视觉语言导航 VLN（Vision-Language Navigation，室内/地面无人机）。<br>
-        🔬 探索 RL 与 LLM；编程语言：C/C++、Python、Java、Go、Qt、Flutter 等。<br>
-        🤖 曾在华南师范大学（SCNU）RoboMaster 战队 VANGUARD 任副队长/视觉组长（通信工程本科）。<br>
-        📫 联系：codealan@qq.com ｜ QQ: 2546379375 ｜ <a href="https://github.com/CodeAlanqian" target="_blank" rel="noreferrer">GitHub</a> ｜ <a href="https://space.bilibili.com/352156963?spm_id_from=333.1007.0.0" target="_blank" rel="noreferrer">B站</a>
-      </p>
-    </div>
-  </section>
-  {{ $paginator := .Paginate $pages }}
   {{ if .IsHome }}
+    <section class="profile">
+      <div class="avatar">
+        <img src="/avatar.png" alt="CodeAlan">
+      </div>
+      <div>
+        <h2 class="name">Hi 👋 This is 龚易乾 (Yiqian Gong, CodeAlan)</h2>
+        <p class="bio">
+          🎓 南方科技大学（SUSTech）电子信息硕士在读，就读于国家卓越工程师学院（NGCE），研究方向：视觉语言导航 VLN（Vision-Language Navigation，室内/地面无人机）。<br>
+          🔬 探索 RL 与 LLM，熟悉无人机系统与行业级无人机研制（含油电混动无人机）、ArduPilot/PX4 生态与无人机管控平台开发。<br>
+          🤖 本科阶段在华南师范大学（SCNU）RoboMaster 战队 VANGUARD 任副队长 / 视觉组长，也参与智能车、机器人等竞赛实践。<br>
+          📫 联系：codealan@qq.com ｜ QQ: 2546379375 ｜ <a href="https://github.com/CodeAlanqian" target="_blank" rel="noreferrer">GitHub</a> ｜ <a href="https://space.bilibili.com/352156963?spm_id_from=333.1007.0.0" target="_blank" rel="noreferrer">B站</a>
+        </p>
+      </div>
+    </section>
+    {{/* 首页主打区域：展示最新若干篇文章的大卡片 */}}
+    {{ $ordered := $pages.ByDate.Reverse }}
+    {{ $featured := first 2 $ordered }}
+    {{ if gt (len $featured) 0 }}
+      <section class="home-featured">
+        {{ range $featured }}
+          {{ partial "article-card.html" . }}
+        {{ end }}
+      </section>
+    {{ end }}
     {{ $tags := site.Taxonomies.tags }}
     {{ if gt (len $tags) 0 }}
       <section class="tag-filter">
@@ -32,11 +41,94 @@
         {{ end }}
       </section>
     {{ end }}
+    <section class="home-top-panel">
+      <div class="home-top-block">
+        <h2 class="home-top-title">📈 阅读量 Top</h2>
+        <ul class="home-top-list" id="homeTopViews"></ul>
+      </div>
+      <div class="home-top-block">
+        <h2 class="home-top-title">👍 点赞 Top</h2>
+        <ul class="home-top-list" id="homeTopLikes"></ul>
+      </div>
+      <p class="home-top-hint">统计来自站内服务端浏览量 / 点赞数据，刚上线时可能暂时为空。</p>
+    </section>
+    <section class="home-topics">
+      <h2 class="home-topics-title">📚 精选专题</h2>
+      <div class="home-topics-grid">
+        <a class="home-topic-card" href="{{ "/tags/uav/" | relURL }}">
+          <div class="home-topic-icon">🛰️</div>
+          <div class="home-topic-body">
+            <h3>无人机系统与导航</h3>
+            <p>从 PX4 / ArduPilot 到导航与控制、行业级无人机实践。</p>
+          </div>
+        </a>
+        <a class="home-topic-card" href="{{ "/tags/docker/" | relURL }}">
+          <div class="home-topic-icon">🐳</div>
+          <div class="home-topic-body">
+            <h3>Docker 与工程环境</h3>
+            <p>容器化开发环境、Nextcloud、LLM 服务与工程部署笔记。</p>
+          </div>
+        </a>
+        <a class="home-topic-card" href="{{ "/tags/vln/" | relURL }}">
+          <div class="home-topic-icon">🧭</div>
+          <div class="home-topic-body">
+            <h3>VLN / 具身智能笔记</h3>
+            <p>Vision-Language Navigation、RL、Embodied AI 相关论文与课程摘记。</p>
+          </div>
+        </a>
+      </div>
+    </section>
+  {{ else }}
+    <section class="profile">
+      <div class="avatar">
+        <img src="/avatar.png" alt="CodeAlan">
+      </div>
+      <div>
+        <h2 class="name">Hi 👋 This is 龚易乾 (Yiqian Gong, CodeAlan)</h2>
+        <p class="bio">
+          🎓 南方科技大学（SUSTech）电子信息硕士在读，就读于国家卓越工程师学院（NGCE），研究方向：视觉语言导航 VLN（Vision-Language Navigation，室内/地面无人机）。<br>
+          🔬 探索 RL 与 LLM，熟悉无人机系统与行业级无人机研制（含油电混动无人机）、ArduPilot/PX4 生态与无人机管控平台开发。<br>
+          🤖 本科阶段在华南师范大学（SCNU）RoboMaster 战队 VANGUARD 任副队长 / 视觉组长，也参与智能车、机器人等竞赛实践。<br>
+          📫 联系：codealan@qq.com ｜ QQ: 2546379375 ｜ <a href="https://github.com/CodeAlanqian" target="_blank" rel="noreferrer">GitHub</a> ｜ <a href="https://space.bilibili.com/352156963?spm_id_from=333.1007.0.0" target="_blank" rel="noreferrer">B站</a>
+        </p>
+      </div>
+    </section>
   {{ end }}
+  {{ $paginator := .Paginate $pages }}
   <section class="post-list">
     {{ range $paginator.Pages }}
       {{ partial "article-card.html" . }}
     {{ end }}
     {{ partial "pagination.html" . }}
   </section>
+  {{ if .IsHome }}
+    <script>
+      (function() {
+        const titleMap = new Map();
+        {{- range $pages }}
+          titleMap.set({{ .RelPermalink | jsonify }}, {{ .Title | jsonify }});
+        {{- end }}
+        const renderTop = (id, items) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (!items || !items.length) {
+            el.innerHTML = '<li class="home-top-empty">暂无数据</li>';
+            return;
+          }
+          el.innerHTML = items.map((item) => {
+            const title = titleMap.get(item.path) || item.path;
+            return '<li class="home-top-item"><a href="' + item.path + '">' + title + '</a><span class="home-top-count">' + item.count + '</span></li>';
+          }).join('');
+        };
+        fetch('/api/stats/top-views?limit=5')
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => renderTop('homeTopViews', data))
+          .catch(() => renderTop('homeTopViews', null));
+        fetch('/api/stats/top-likes?limit=5')
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => renderTop('homeTopLikes', data))
+          .catch(() => renderTop('homeTopLikes', null));
+      })();
+    </script>
+  {{ end }}
 {{ end }}

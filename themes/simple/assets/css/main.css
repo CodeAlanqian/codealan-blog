@@ -448,6 +448,19 @@ a {
   margin-top: 16px;
 }
 
+.home-featured {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 900px) {
+  .home-featured {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .profile {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -544,6 +557,30 @@ a {
   gap: 8px;
 }
 
+.card-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.card-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.03);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .card-cover {
   border-radius: 10px;
   text-align: center;
@@ -552,15 +589,16 @@ a {
 
 .card-cover img {
   max-width: 100%;
-  max-height: 450px;
+  max-height: 380px;
   display: block;
   margin: 0 auto;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 @media (max-width: 720px) {
   .card-cover img {
-    max-height: 300px;
+    max-height: 260px;
   }
 }
 
@@ -589,6 +627,7 @@ a {
 .meta .tag {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   padding: 2px 8px;
   margin-left: 6px;
   margin-top: 2px;
@@ -631,6 +670,10 @@ a {
   color: #7e22ce;
 }
 
+.tag[data-tag-key="llm"]::before {
+  content: "🤖";
+}
+
 .tag[data-tag-key="obsidian"] {
   background: rgba(148, 163, 184, 0.18);
   color: #475569;
@@ -651,6 +694,19 @@ a {
 .tag[data-tag-key="navigation"] {
   background: rgba(45, 212, 191, 0.14);
   color: #0f766e;
+}
+
+.tag[data-tag-key="navigation"]::before {
+  content: "🧭";
+}
+
+.tag[data-tag-key="uav"] {
+  background: rgba(56, 189, 248, 0.16);
+  color: #0369a1;
+}
+
+.tag[data-tag-key="uav"]::before {
+  content: "🛰️";
 }
 
 .tag[data-tag-key="项目"],
@@ -678,6 +734,21 @@ a {
 .tag[data-tag-key="latex"] {
   background: rgba(129, 140, 248, 0.16);
   color: #4338ca;
+}
+
+.tag[data-tag-key="docker"]::before {
+  content: "🐳";
+}
+
+.tag[data-tag-key="ros"],
+.tag[data-tag-key="ros_note"] {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.tag[data-tag-key="ros"]::before,
+.tag[data-tag-key="ros_note"]::before {
+  content: "🤖";
 }
 
 .tag[data-tag-key="habitat"] {
@@ -889,11 +960,23 @@ a {
 .tag-knowledge-label {
   font-weight: 600;
   margin-right: 6px;
+  position: relative;
+  padding-left: 18px;
 }
 
 .tag-knowledge-tags {
   color: var(--muted);
   font-size: 13px;
+}
+
+.tag-knowledge-label::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--accent);
 }
 
 .tag-count {
@@ -1061,6 +1144,12 @@ a {
   color: #e5f0ff;
 }
 
+.archive-year-chart-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .archive-year {
   margin-bottom: 20px;
 }
@@ -1120,7 +1209,7 @@ a {
 }
 
 .archive-year-title {
-  margin: 0 0 8px;
+  margin: 0 0 0px;
   font-size: 18px;
 }
 
@@ -1220,6 +1309,119 @@ a {
   margin-left: 8px;
 }
 
+.home-top-panel {
+  margin: 18px 0 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.home-top-block {
+  min-width: 0;
+}
+
+.home-top-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.home-top-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.home-top-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2px 0;
+}
+
+.home-top-item a {
+  color: var(--accent);
+}
+
+.home-top-item a:hover {
+  text-decoration: underline;
+}
+
+.home-top-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.home-top-empty {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.home-top-hint {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.home-topics {
+  margin: 14px 0 0;
+}
+
+.home-topics-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.home-topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.home-topic-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.home-topic-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.home-topic-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.08);
+}
+
+.home-topic-body h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.home-topic-body p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .post {
   background: var(--card);
   border: 1px solid var(--border);
@@ -1232,10 +1434,44 @@ a {
   margin: 6px 0 12px;
 }
 
+.post-header .meta,
+.post-header .meta-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
 .post .cover img {
   width: 100%;
   border-radius: 10px;
   border: 1px solid var(--border);
+}
+
+.page-academic .post {
+  border-radius: 18px;
+}
+
+.page-academic .post .content h2,
+.page-academic .post .content h3 {
+  position: relative;
+  padding-left: 14px;
+}
+
+.page-academic .post .content h2::before,
+.page-academic .post .content h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.page-academic .post .content ul {
+  margin-left: 0;
+  padding-left: 18px;
 }
 
 .post-body {
@@ -1493,6 +1729,19 @@ a {
   max-width: 100%;
 }
 
+.content blockquote {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--muted);
+}
+
+.content blockquote p {
+  margin: 0.25em 0;
+}
+
 .katex-display {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -1597,6 +1846,21 @@ a {
   color: var(--muted);
   display: block;
   margin-bottom: 4px;
+}
+
+.bibref-meta {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.bibref-meta-venue {
+  font-weight: 600;
+}
+
+.bibref-meta-year {
+  margin-left: 6px;
 }
 
 .bibref-code {

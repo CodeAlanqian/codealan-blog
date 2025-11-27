@@ -84,7 +84,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   {{ end }}
 </head>
-<body class="no-js">
+<body class="no-js{{ if .IsHome }} home{{ end }}{{ if eq .RelPermalink "/academic/" }} page-academic{{ end }}">
   <header class="site-header">
     <div class="brand">
       <a href="{{ "/" | relURL }}">{{ site.Title }}</a>

@@ -1,10 +1,17 @@
 {{- $title := .Get "title" -}}
 {{- $url := .Get "url" | default "#" -}}
+{{- $venue := .Get "venue" | default "" -}}
+{{- $year := .Get "year" | default "" -}}
 <span class="bibref">
   <a href="{{ $url }}" target="_blank" rel="noreferrer noopener" class="bibref-link">{{ $title }}</a>
   <span class="bibref-popover">
+    {{ if or $venue $year }}
+      <span class="bibref-meta">
+        {{ if $venue }}<span class="bibref-meta-venue">{{ $venue }}</span>{{ end }}
+        {{ if $year }}<span class="bibref-meta-year">{{ $year }}</span>{{ end }}
+      </span>
+    {{ end }}
     <span class="bibref-popover-title">BibTeX</span>
     <pre class="bibref-code"><code>{{ .Inner | safeHTML }}</code></pre>
   </span>
 </span>
-

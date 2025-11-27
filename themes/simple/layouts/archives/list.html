@@ -1,6 +1,5 @@
 {{ define "main" }}
   <section class="hero">
-    <p class="eyebrow">归档</p>
     <h1>{{ .Title }}</h1>
   </section>
   {{ $pages := where site.RegularPages "Section" "in" (slice "posts" "obsidian") }}
@@ -69,6 +68,7 @@
             </li>
           {{ end }}
         </ul>
+        <p class="archive-year-chart-hint">条形越长，说明该年份写的文章越多，可直观感受不同阶段的创作密度。</p>
       </div>
     {{ end }}
     <div class="archive-stats-extra">

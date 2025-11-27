@@ -7,7 +7,7 @@ title: 'AerialVLN: Vision-and-Language Navigation for UAVs'
 authors: Liu, Shubo; Zhang, Hongsheng; Qi, Yuankai; Wang, Peng; Zhang, Yanning; Wu,
   Qi
 publication: ''
-date: 2023-10-01
+date: 2025-10-01
 lastmod: 2025-11-26
 citekey: liuAerialVLNVisionandLanguageNavigation2023
 doi: 10.1109/ICCV51070.2023.01411
@@ -33,7 +33,7 @@ tags:
 ---
 
 ## 🧾 Metadata
-- **Start date:** 2023-10-01
+- **Start date:** 2025-10-01
 - **End date:** 
 - **Page range:** 15384
 - **Keywords:** #obscite 
@@ -97,7 +97,7 @@ tags:
 
 
 
-![](/obsidian/Zotero/Zotero/assets/liuAerialVLNVisionandLanguageNavigation2023/image-2-x63-y553.png)
+![](/obsidian/Zotero/assets/liuAerialVLNVisionandLanguageNavigation2023/image-2-x63-y553.png)
 
 ---
 >[!quote|#ffd400]+ **📌 Important**
@@ -127,7 +127,7 @@ tags:
 
 
 
-![](/obsidian/Zotero/Zotero/assets/liuAerialVLNVisionandLanguageNavigation2023/image-3-x55-y631.png)
+![](/obsidian/Zotero/assets/liuAerialVLNVisionandLanguageNavigation2023/image-3-x55-y631.png)
 
 --- %% end annotations %%
 

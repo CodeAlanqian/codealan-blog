@@ -4,6 +4,25 @@
     {{ $dataTags = $dataTags | append (. | urlize) }}
   {{ end }}
 {{ end }}
+{{/* 简单推断文章类型：研究笔记 / 实战教程 / 随笔 */}}
+{{ $typeLabel := "" }}
+{{ $tagsLower := slice }}
+{{ with .Params.tags }}
+  {{ range . }}
+    {{ $tagsLower = $tagsLower | append (lower .) }}
+  {{ end }}
+{{ end }}
+{{ if in $tagsLower "ros_note" }}
+  {{ $typeLabel = "研究笔记" }}
+{{ else if or (in $tagsLower "docker") (in $tagsLower "ubuntu") (in $tagsLower "security") (in $tagsLower "nextcloud") }}
+  {{ $typeLabel = "实战教程" }}
+{{ else if in $tagsLower "vln" }}
+  {{ $typeLabel = "研究笔记" }}
+{{ else if in $tagsLower "llm" }}
+  {{ $typeLabel = "研究笔记" }}
+{{ else }}
+  {{ $typeLabel = "随笔 / 记录" }}
+{{ end }}
 <article class="card"{{ if gt (len $dataTags) 0 }} data-tags="{{ delimit $dataTags "," }}"{{ end }}>
   <a class="card-link" href="{{ .RelPermalink }}">
     {{ $cover := .Params.cover }}
@@ -32,9 +51,14 @@
         </div>
       {{ end }}
       <div class="card-head">
+        <div class="card-head-top">
+          {{ with $typeLabel }}
+            <span class="card-type">{{ . }}</span>
+          {{ end }}
+          <span class="card-date">{{ .Date.Format "2006-01-02" }}</span>
+        </div>
         <h2>{{ .Title }}</h2>
         <p class="meta">
-          {{ .Date.Format "2006-01-02" }}
           {{ with .Params.tags }}
             {{ range . }}
               <span class="tag" data-tag-key="{{ . | urlize }}">{{ . }}</span>
