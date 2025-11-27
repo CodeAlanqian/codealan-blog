@@ -210,10 +210,11 @@
   - 样式定义在 `themes/simple/assets/css/main.css` 中的 `.tag-graph*` 相关类，包括卡片风格、SVG 宽度、自适应等。  
 
 - 个人 AI 助手（DeepSeek API 代理）  
-  - 需求：在博客中加入一个“个人 AI”辅助问答入口，但不能在前端暴露任何 API Key。  
+  - 需求：在博客中加入一个“个人 AI”辅助问答入口，但不能在前端暴露任何 API Key，同时能统计所有用户的文章浏览量。  
   - 后端实现：  
-    - 在仓库根目录新增 `ai_server.py`，使用 FastAPI + httpx 构建轻量代理服务：  
+    - 在仓库根目录新增 `blog_server.py`（原 `ai_server.py`），使用 FastAPI + httpx 构建轻量后端服务：  
       - 暴露 `POST /api/ai/chat`，请求体为 `{"messages": [{"role": "user"/"assistant"/"system", "content": "..."}]}`。  
+      - 暴露 `POST /api/views/hit?path=/xxx/`，按文章路径在本地 SQLite 数据库 `views.db` 中累加全站浏览量，并返回最新总数。  
       - 服务端优先通过环境变量 `DEEPSEEK_API_KEY` 读取 DeepSeek Key，若未配置则尝试从项目根目录 `.env` 文件中解析同名变量。  
       - `.env` 示例见 `.env.example`，真实 `.env` 文件已通过 `.gitignore` 忽略，不会进入仓库。  
       - 若找到 Key，则转发到 `https://api.deepseek.com/v1/chat/completions`。  
@@ -226,17 +227,17 @@
     - 启动方式示例：  
       - `pip install fastapi uvicorn httpx`  
       - 在根目录创建 `.env`，写入 `DEEPSEEK_API_KEY=your_deepseek_api_key`（或直接导出环境变量）。  
-      - `python ai_server.py` 或 `uvicorn ai_server:app --host 127.0.0.1 --port 9000`。  
-    - 部署建议：在 Nginx 中增加反向代理，将 `/api/ai/` 前缀转发到本机 9000 端口，确保浏览器始终只与同源接口交互。  
-    - 为运维方便，新增 `start_ai.sh`：  
-      - 启动前会查找并优雅关闭已有的 `ai_server.py` 进程（先 `SIGTERM`，必要时 `SIGKILL`），再以 `nohup python ai_server.py >> ai_log.log 2>&1 &` 方式后台重启。  
+      - `python blog_server.py` 或 `uvicorn blog_server:app --host 127.0.0.1 --port 9000`。  
+    - 部署建议：在 Nginx 中增加反向代理，将 `/api/` 前缀转发到本机 9000 端口，确保浏览器始终只与同源接口交互（AI 与浏览量接口共用同一路由前缀）。  
+  - 为运维方便，新增 `start_backend.sh`（原 `start_ai.sh`）：  
+      - 启动前会查找并优雅关闭已有的 `blog_server.py` 进程（先 `SIGTERM`，必要时 `SIGKILL`），再以 `nohup python blog_server.py >> backend.log 2>&1 &` 方式后台重启。  
       - 自动从 `.env` 中读取需要的环境变量。  
-      - 日志统一写入 `ai_log.log`，该文件已在 `.gitignore` 中忽略。  
+      - 日志统一写入 `backend.log`，该文件已在 `.gitignore` 中忽略。  
   - 前端集成：  
     - 在 `themes/simple/layouts/partials/ai-chat.html` 中定义浮动聊天组件：  
       - 右下角悬浮按钮（带「🤖 AI」字样），点击后弹出小型聊天面板。  
       - 面板内包含对话区、输入框与发送按钮，支持多轮对话展示。  
-    - 在全局模板 `themes/simple/layouts/_default/baseof.html` 中引入该 partial，并添加前端逻辑：  
+      - 在全局模板 `themes/simple/layouts/_default/baseof.html` 中引入该 partial，并添加前端逻辑：  
       - 维护简单的 `history` 数组保存当前会话的 role/content 列表。  
       - 发送时根据环境自动选择调用地址：  
         - 本地预览（`localhost/127.0.0.1/0.0.0.0`）时，直接请求 `http://127.0.0.1:9000/api/ai/chat`。  
@@ -244,6 +245,9 @@
       - 后端允许 `http://localhost:1313` 等来源（CORS）访问，便于本地开发调试。  
       - 对响应中的 `reply` 追加到对话区，失败时在面板内显示错误提示而不打断其他功能。  
       - 支持 `Enter` 发送、`Shift+Enter` 换行，并有“思考中…”状态提示。  
+    - 浏览量展示：  
+      - 在文章模板 `themes/simple/layouts/_default/single.html` 中，在标题下方加入浏览量区域：`👀 <span class="view-count" data-key="{{ .RelPermalink }}">0</span> 次浏览`。  
+      - 在全局脚本（`baseof.html` 底部）中新增逻辑：优先调用 `/api/views/hit?path={{ .RelPermalink }}` 更新全站累积浏览量；若调用失败，则退回到浏览器 `localStorage` 本地统计，以保证在后端不可用时仍能显示一个递增数字。  
     - 展示与样式：  
       - 在 `themes/simple/layouts/_default/baseof.html` 中实现了一个轻量级 Markdown 渲染器，用于在 AI 回复中支持：  
         - 标题（`#` 开头）、无序列表（`-` / `*`）、行内代码 `` `code` ``、代码块 ```lang```、粗体 `**text**` / `__text__`、超链接 `[text](url)` 等。  

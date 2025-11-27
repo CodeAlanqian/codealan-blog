@@ -374,19 +374,45 @@
     })();
     (function() {
       const el = document.querySelector('.view-count');
-      if (!el || typeof window === 'undefined' || !window.localStorage) return;
+      if (!el || typeof window === 'undefined') return;
       const key = el.getAttribute('data-key') || window.location.pathname;
-      const storageKey = 'views:' + key;
-      let count = 0;
+
+      const updateLocalFallback = () => {
+        if (!window.localStorage) return;
+        const storageKey = 'views:' + key;
+        let count = 0;
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw) count = parseInt(raw, 10) || 0;
+        } catch (e) {}
+        count += 1;
+        el.textContent = count;
+        try {
+          localStorage.setItem(storageKey, String(count));
+        } catch (e) {}
+      };
+
+      // 优先使用服务端统计接口，失败时退回本地统计
+      const url = '/api/views/hit?path=' + encodeURIComponent(key);
       try {
-        const raw = localStorage.getItem(storageKey);
-        if (raw) count = parseInt(raw, 10) || 0;
-      } catch (e) {}
-      count += 1;
-      el.textContent = count;
-      try {
-        localStorage.setItem(storageKey, String(count));
-      } catch (e) {}
+        fetch(url, { method: 'POST' })
+          .then((resp) => {
+            if (!resp.ok) throw new Error('bad status: ' + resp.status);
+            return resp.json();
+          })
+          .then((data) => {
+            if (!data || typeof data.count !== 'number') {
+              updateLocalFallback();
+              return;
+            }
+            el.textContent = String(data.count);
+          })
+          .catch(() => {
+            updateLocalFallback();
+          });
+      } catch (e) {
+        updateLocalFallback();
+      }
     })();
     (function() {
       const article = document.querySelector('.post');

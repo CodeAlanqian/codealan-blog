@@ -31,16 +31,18 @@
   - 标签统一使用 `data-tag-key`，根据领域自动上色（如 `vln` / `ros` / `docker` / `rl` / `llm` / `ubuntu` / `latex` / `habitat` 等）。  
   - 搜索结果页和文章卡片中的标签颜色保持一致。  
 
-## 个人 AI 助手（DeepSeek 代理）
+## 博客后台：AI 代理 + 浏览量统计
 
 - 后端：  
-  - 根目录下 `ai_server.py` 使用 FastAPI + httpx 实现一个轻量代理服务，暴露接口：`POST /api/ai/chat`。  
-  - 通过环境变量 `DEEPSEEK_API_KEY` 读取 DeepSeek 的 API Key（不写入仓库，不在前端暴露）。  
+  - 根目录下 `blog_server.py` 使用 FastAPI + httpx 实现轻量后端服务：  
+    - `POST /api/ai/chat`：个人 AI 代理，转发到 DeepSeek Chat API。  
+    - `POST /api/views/hit?path=/xxx/`：文章浏览量统计接口，按路径在本地 SQLite 中累加总浏览量。  
+  - 通过环境变量 `DEEPSEEK_API_KEY`（或 `.env`）读取 DeepSeek 的 API Key（不写入仓库，不在前端暴露）。  
   - 请求转发到 `https://api.deepseek.com/v1/chat/completions`，使用 `deepseek-chat` 模型，兼容 OpenAI 风格。  
 - 前端：  
-  - 在所有页面右下角提供一个「个人 AI 助手」浮动按钮，点击展开聊天面板。  
+  - 所有页面右下角提供「个人 AI 助手」浮动按钮，点击展开聊天面板。  
   - 面板支持多轮对话，默认向后端发送当前会话的所有 `messages`。  
-  - 对于调用失败，会在面板内显示友好的错误提示，不影响页面其它功能。  
+  - 文章页标题下方展示“👀 N 次浏览”，优先从 `/api/views/hit` 获取全站累计浏览量；若接口不可用，则退回浏览器 `localStorage` 本地计数。  
 - 启动示例：  
   ```bash
   # 安装依赖（建议使用虚拟环境）
@@ -49,10 +51,10 @@
   # 配置环境变量（请使用你自己的 Key）
   export DEEPSEEK_API_KEY="your_deepseek_api_key"
 
-  # 启动本地代理服务
-  python ai_server.py  # 默认监听 127.0.0.1:9000
+  # 启动本地后端服务
+  python blog_server.py  # 默认监听 127.0.0.1:9000
   ```  
-  然后在 Nginx 中将 `/api/ai/` 转发到 `127.0.0.1:9000` 即可在正式站点使用。  
+  然后在 Nginx 中将 `/api/` 前缀转发到 `127.0.0.1:9000` 即可在正式站点使用（AI 与浏览量接口共用同一后端）。  
 
 ## 部署与 Nginx（摘要）
 

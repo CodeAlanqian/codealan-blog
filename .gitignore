@@ -13,5 +13,7 @@ public/**/*.pdf
 # Local secrets / env config
 .env
 
-# Local runtime logs
+# Local runtime logs and data
 ai_log.log
+backend.log
+views.db

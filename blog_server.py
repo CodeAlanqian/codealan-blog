@@ -6,6 +6,8 @@ import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import sqlite3
+import threading
 
 
 def _load_deepseek_key() -> Optional[str]:
@@ -45,7 +47,7 @@ def _load_deepseek_key() -> Optional[str]:
         os.environ.setdefault("DEEPSEEK_API_KEY", value)
     return value
 
-app = FastAPI(title="CodeAlan Blog AI Proxy")
+app = FastAPI(title="CodeAlan Blog Backend")
 
 # 可按需要调整允许的来源；默认允许同源 + 本地开发
 origins = [
@@ -59,7 +61,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -75,6 +77,68 @@ class ChatRequest(BaseModel):
 
 class ChatReply(BaseModel):
     reply: str
+
+
+class ViewHitResponse(BaseModel):
+    path: str
+    count: int
+
+
+_DB_LOCK = threading.Lock()
+_DB_PATH = Path(__file__).resolve().parent / "views.db"
+
+
+def _init_db() -> None:
+    """
+    初始化（或确保存在）SQLite 数据库和 views 表。
+    """
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS views (
+                    path TEXT PRIMARY KEY,
+                    count INTEGER NOT NULL
+                )
+                """
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+
+def _increment_view(path: str) -> int:
+    """
+    将指定 path 的浏览量 +1，并返回最新总数。
+    """
+    if not path:
+        path = "/"
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT count FROM views WHERE path = ?", (path,))
+            row = cur.fetchone()
+            if row is None:
+                count = 1
+                cur.execute(
+                    "INSERT INTO views (path, count) VALUES (?, ?)", (path, count)
+                )
+            else:
+                count = int(row[0]) + 1
+                cur.execute(
+                    "UPDATE views SET count = ? WHERE path = ?", (count, path)
+                )
+            conn.commit()
+            return count
+        finally:
+            conn.close()
+
+
+@app.on_event("startup")
+def _on_startup() -> None:
+    _init_db()
 
 
 @app.post("/api/ai/chat", response_model=ChatReply)
@@ -157,8 +221,18 @@ Behavior guidelines:
     return ChatReply(reply=content)
 
 
+@app.post("/api/views/hit", response_model=ViewHitResponse)
+async def hit_view(path: str) -> ViewHitResponse:
+    """
+    记录某个页面被浏览一次，并返回所有用户的累计浏览量。
+    - 参数 path：通常使用 Hugo 的 .RelPermalink，例如 /posts/xxx/。
+    """
+    count = _increment_view(path)
+    return ViewHitResponse(path=path, count=count)
+
+
 if __name__ == "__main__":
-    # 开发环境可直接运行：python ai_server.py
+    # 开发环境可直接运行：python blog_server.py
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=9000)
