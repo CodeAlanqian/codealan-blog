@@ -155,7 +155,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
   - 具身智能与 VLN 相关课程、论文的阅读笔记与小规模实验（部分会整理为博客文章）。  
   - 围绕 Nextcloud、ROS、LLM 等服务的 Docker 部署与调试实践，侧重工程环境搭建与自动化。
 
-> 更多偏工程实践和配置相关的内容，可以在博客的文章列表中找到，对应标签如 `VLN`、`ROS_NOTE`、`Docker`、`LLM` 等。
+> 更多偏工程实践和配置相关的内容，可以在博客的文章列表中找到，对应标签如 VLN、ROS_NOTE、Docker、LLM 等。
 
 ### 正在进行的方向
 
