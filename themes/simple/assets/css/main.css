@@ -1865,6 +1865,7 @@ a {
 
 .katex-display::-webkit-scrollbar {
   height: 4px;
+  width: 4px;
 }
 
 .katex-display::-webkit-scrollbar-thumb {
@@ -2466,7 +2467,8 @@ a {
 
 
 .content .code-block pre::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
+  width: 4px;
 }
 .content .code-block pre::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.85);
