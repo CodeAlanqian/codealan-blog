@@ -59,6 +59,7 @@
         {{ end }}
       </nav>
       <button class="post-share" type="button" id="postShareBtn">复制本页链接</button>
+      <button class="post-ppt" type="button" id="postPptBtn">PPT 式阅读</button>
       {{ $current := . }}
       {{ $allPages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
       {{ $others := where $allPages "Permalink" "ne" $current.Permalink }}
@@ -83,7 +84,6 @@
           </ul>
         </section>
       {{ end }}
-      <button class="post-ppt" type="button" id="postPptBtn">PPT 式阅读</button>
     </footer>
   </article>
 {{ end }}

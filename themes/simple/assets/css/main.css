@@ -856,6 +856,46 @@ a {
   fill: var(--text);
 }
 
+.tag-knowledge-tree {
+  margin: 16px 0 22px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.tag-knowledge-tree h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.tag-knowledge-hint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.tag-knowledge-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.tag-knowledge-node {
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.tag-knowledge-label {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.tag-knowledge-tags {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .tag-count {
   min-width: 20px;
   height: 20px;
@@ -872,8 +912,115 @@ a {
   margin-top: 16px;
 }
 
+.archive-stats {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.archive-stats-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.archive-stats-subtitle {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.archive-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.archive-stats-card {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.archive-stats-label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.archive-stats-value {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.archive-stats-tags {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.archive-stats-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 2px 4px 0 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
 .archive-year {
   margin-bottom: 20px;
+}
+
+.archive-year-toggle {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.archive-year-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.archive-year-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.archive-year-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.archive-year-body {
+  margin-top: 6px;
+}
+
+.archive-year.is-open .archive-year-body {
+  display: block;
+}
+
+.archive-year:not(.is-open) .archive-year-body {
+  display: none;
+}
+
+.archive-month {
+  margin-top: 4px;
 }
 
 .archive-year-title {

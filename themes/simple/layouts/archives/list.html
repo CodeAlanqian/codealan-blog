@@ -3,20 +3,72 @@
     <p class="eyebrow">归档</p>
     <h1>{{ .Title }}</h1>
   </section>
-  <section class="archive-list">
-    {{ $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
-    {{ range $group := $pages.GroupByDate "2006" }}
-      <div class="archive-year">
-        <h2 class="archive-year-title">{{ $group.Key }}</h2>
-        <ul class="archive-items">
-          {{ range $group.Pages.ByDate.Reverse }}
-            <li class="archive-item">
-              <span class="archive-date">{{ .Date.Format "01-02" }}</span>
-              <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-            </li>
+  {{ $pages := where site.RegularPages "Section" "in" (slice "posts" "obsidian") }}
+  <section class="archive-stats">
+    <h2 class="archive-stats-title">数据与分析</h2>
+    <p class="archive-stats-subtitle">简单统计站内文章的数量、时间分布与标签。</p>
+    <div class="archive-stats-grid">
+      <div class="archive-stats-card">
+        <p class="archive-stats-label">总文章数</p>
+        <p class="archive-stats-value">{{ len $pages }}</p>
+      </div>
+      <div class="archive-stats-card">
+        {{ $posts := where $pages "Section" "posts" }}
+        {{ $obs := where $pages "Section" "obsidian" }}
+        <p class="archive-stats-label">正式博文 / Obsidian</p>
+        <p class="archive-stats-value">{{ len $posts }} / {{ len $obs }}</p>
+      </div>
+      <div class="archive-stats-card">
+        {{ $byYear := $pages.GroupByDate "2006" }}
+        <p class="archive-stats-label">涉及年份</p>
+        <p class="archive-stats-value">{{ len $byYear }}</p>
+      </div>
+      <div class="archive-stats-card">
+        {{ $topTags := first 6 (sort site.Taxonomies.tags "Count" "desc") }}
+        <p class="archive-stats-label">Top 标签</p>
+        <p class="archive-stats-tags">
+          {{ range $name, $term := $topTags }}
+            <span class="archive-stats-tag">{{ $name }}</span>
           {{ end }}
-        </ul>
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="archive-list">
+    {{ range $group := $pages.GroupByDate "2006" }}
+      <div class="archive-year is-open" data-year="{{ $group.Key }}">
+        <button class="archive-year-toggle" type="button">
+          <span class="archive-year-title">{{ $group.Key }}</span>
+          <span class="archive-year-count">{{ len $group.Pages }} 篇</span>
+        </button>
+        <div class="archive-year-body">
+          {{ range $month := $group.Pages.GroupByDate "01" }}
+            <div class="archive-month">
+              <h3 class="archive-month-title">{{ $month.Key }} 月</h3>
+              <ul class="archive-items">
+                {{ range $month.Pages.ByDate.Reverse }}
+                  <li class="archive-item">
+                    <span class="archive-date">{{ .Date.Format "01-02" }}</span>
+                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                  </li>
+                {{ end }}
+              </ul>
+            </div>
+          {{ end }}
+        </div>
       </div>
     {{ end }}
   </section>
+  <script>
+    (function() {
+      const years = document.querySelectorAll('.archive-year');
+      years.forEach((year) => {
+        const toggle = year.querySelector('.archive-year-toggle');
+        if (!toggle) return;
+        toggle.addEventListener('click', () => {
+          year.classList.toggle('is-open');
+        });
+      });
+    })();
+  </script>
 {{ end }}
