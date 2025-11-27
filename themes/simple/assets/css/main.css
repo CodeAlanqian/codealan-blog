@@ -341,12 +341,7 @@ a {
     font-size: 18px;
   }
   .tagline {
-    display: block;
-    max-width: 100%;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none;
   }
   .site-nav a {
     margin-left: 0;
