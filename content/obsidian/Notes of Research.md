@@ -24,7 +24,7 @@ About VLM
 
 https://mp.weixin.qq.com/s/cTOPdjYscWUZyag5I_un0g
 
-![](/static/obsidian/assets/Notes%20of%20Research/file-20251117210426523.png)
+![](/obsidian/assets/Notes%20of%20Research/file-20251117210426523.png)
 
 
 [第37期 手把手教程！zotero和obsidian如何联动](https://mp.weixin.qq.com/s?__biz=MzkwMDYxODg5MA==&mid=2247487928&idx=1&sn=2033516aec49f5cd45e3826e702ca4db&chksm=c0401e5df737974ba546f8397c8201f44572f6908fe275f26fdd2804ae1b59dd59ed091d6ec7&scene=21#wechat_redirect)
