@@ -4,6 +4,8 @@
     <h1>{{ .Title }}</h1>
   </section>
   {{ $pages := where site.RegularPages "Section" "in" (slice "posts" "obsidian") }}
+  {{ $byYearFull := $pages.GroupByDate "2006" }}
+  {{ $byMonthFull := $pages.GroupByDate "2006-01" }}
   <section class="archive-stats">
     <h2 class="archive-stats-title">数据与分析</h2>
     <p class="archive-stats-subtitle">简单统计站内文章的数量、时间分布与标签。</p>
@@ -19,17 +21,14 @@
         <p class="archive-stats-value">{{ len $posts }} / {{ len $obs }}</p>
       </div>
       <div class="archive-stats-card">
-        {{ $byYear := $pages.GroupByDate "2006" }}
         <p class="archive-stats-label">涉及年份</p>
-        <p class="archive-stats-value">{{ len $byYear }}</p>
+        <p class="archive-stats-value">{{ len $byYearFull }}</p>
       </div>
       <div class="archive-stats-card">
-        {{ $byMonth := $pages.GroupByDate "2006-01" }}
         <p class="archive-stats-label">平均每月文章数</p>
-        <p class="archive-stats-value">{{ div (len $pages) (len $byMonth) }}</p>
+        <p class="archive-stats-value">{{ div (len $pages) (len $byMonthFull) }}</p>
       </div>
       <div class="archive-stats-card">
-        {{ $byYearFull := $pages.GroupByDate "2006" }}
         {{ $maxYear := "" }}
         {{ $maxCount := 0 }}
         {{ range $byYearFull }}
@@ -42,7 +41,6 @@
         <p class="archive-stats-value">{{ if $maxYear }}{{ $maxYear }}（{{ $maxCount }} 篇）{{ else }}—{{ end }}</p>
       </div>
       <div class="archive-stats-card">
-        {{ $byMonthFull := $pages.GroupByDate "2006-01" }}
         {{ $maxMonthKey := "" }}
         {{ $maxMonthCount := 0 }}
         {{ range $byMonthFull }}
@@ -55,6 +53,24 @@
         <p class="archive-stats-value">{{ if $maxMonthKey }}{{ $maxMonthKey }}（{{ $maxMonthCount }} 篇）{{ else }}—{{ end }}</p>
       </div>
     </div>
+    {{ if gt (len $byYearFull) 0 }}
+      <div class="archive-year-chart">
+        <p class="archive-stats-label">按年份文章数</p>
+        <ul class="archive-year-chart-list">
+          {{ range $byYearFull }}
+            {{ $yearCount := len .Pages }}
+            {{ $ratio := mul 100 (div $yearCount $maxCount) }}
+            <li class="archive-year-chart-item">
+              <span class="archive-year-chart-label">{{ .Key }}</span>
+              <div class="archive-year-chart-bar">
+                <span class="archive-year-chart-fill" style="width: {{ $ratio }}%;"></span>
+                <span class="archive-year-chart-count">{{ $yearCount }}</span>
+              </div>
+            </li>
+          {{ end }}
+        </ul>
+      </div>
+    {{ end }}
     <div class="archive-stats-extra">
       <div class="archive-top-block">
         <p class="archive-stats-label">阅读量 Top 5</p>
@@ -134,15 +150,27 @@
       fetch('/api/stats/top-views?limit=5')
         .then((res) => res.ok ? res.json() : null)
         .then((data) => {
-          if (data) renderTop('archiveTopViews', data);
+          if (data) {
+            renderTop('archiveTopViews', data);
+          } else {
+            renderTop('archiveTopViews', null);
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          renderTop('archiveTopViews', null);
+        });
       fetch('/api/stats/top-likes?limit=5')
         .then((res) => res.ok ? res.json() : null)
         .then((data) => {
-          if (data) renderTop('archiveTopLikes', data);
+          if (data) {
+            renderTop('archiveTopLikes', data);
+          } else {
+            renderTop('archiveTopLikes', null);
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          renderTop('archiveTopLikes', null);
+        });
     })();
   </script>
 {{ end }}

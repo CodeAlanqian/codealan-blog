@@ -1011,6 +1011,56 @@ a {
   color: var(--muted);
 }
 
+.archive-year-chart {
+  margin-top: 10px;
+}
+
+.archive-year-chart-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.archive-year-chart-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 13px;
+}
+
+.archive-year-chart-label {
+  min-width: 56px;
+  color: var(--muted);
+}
+
+.archive-year-chart-bar {
+  position: relative;
+  flex: 1;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.28);
+  overflow: hidden;
+}
+
+.archive-year-chart-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.85);
+}
+
+.archive-year-chart-count {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #e5f0ff;
+}
+
 .archive-year {
   margin-bottom: 20px;
 }
@@ -1034,6 +1084,12 @@ a {
   border-color: var(--accent);
   color: var(--accent);
   transform: translateY(-1px);
+}
+
+.archive-year.is-open .archive-year-toggle {
+  border-color: var(--accent);
+  background: rgba(14, 165, 233, 0.06);
+  color: var(--accent);
 }
 
 .archive-year-title {
