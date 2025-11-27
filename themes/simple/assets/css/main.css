@@ -2047,7 +2047,7 @@ a {
   opacity: 1;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1360px) {
   .post .toc {
     position: fixed;
     top: 120px;
