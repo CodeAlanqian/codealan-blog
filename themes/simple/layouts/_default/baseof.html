@@ -418,6 +418,27 @@
           body.appendChild(el);
           return el;
         });
+        // 对 PPT 模式中的代码块应用折叠与展开按钮
+        const pptCodeBlocks = overlay.querySelectorAll('.code-block');
+        const maxCollapsed = 220;
+        pptCodeBlocks.forEach((block) => {
+          if (block.dataset.hasCodeToggle === 'true') return;
+          const pre = block.querySelector('pre');
+          if (!pre) return;
+          const scrollHeight = pre.scrollHeight || 0;
+          if (scrollHeight <= maxCollapsed) return;
+          block.classList.add('collapsed');
+          const toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'code-toggle';
+          toggle.textContent = 'Show code';
+          toggle.addEventListener('click', () => {
+            const collapsed = block.classList.toggle('collapsed');
+            toggle.textContent = collapsed ? 'Show code' : 'Hide code';
+          });
+          block.parentNode.insertBefore(toggle, block.nextSibling);
+          block.dataset.hasCodeToggle = 'true';
+        });
         let index = 0;
         const update = () => {
           slideEls.forEach((el, i) => {
