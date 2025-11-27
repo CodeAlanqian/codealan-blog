@@ -6,8 +6,8 @@
         {{ if ne .Lastmod .Date }}
           <span class="meta-updated">· 更新于 {{ .Lastmod.Format "2006-01-02" }}</span>
         {{ end }}
-        {{ with .Params.tags }}
-          {{ range . }}
+        {{ if and (ne .RelPermalink "/academic/") .Params.tags }}
+          {{ range .Params.tags }}
             <a class="tag" data-tag-key="{{ . | urlize }}" href="{{ (print "/tags/" (. | urlize) "/") | relURL }}">{{ . }}</a>
           {{ end }}
         {{ end }}

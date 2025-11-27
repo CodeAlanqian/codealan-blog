@@ -49,7 +49,6 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
   *Multi-sensor fusion SLAM for UAV systems* (2022.12–2024.05)  
   - Studied SLAM methods that fuse camera, LiDAR, IMU and other sensors for robust UAV localization.  
   - Responsible for overall UAV system design, PX4+MAVROS+Gazebo+QGC simulation, physical platform integration, and host-side software (odometry, navigation, decision).  
-  - Familiar with UAV systems and industrial-grade UAV development (e.g., hybrid gasoline-electric UAVs), ArduPilot/PX4 ecosystem, and UAV command-and-control platform development.  
 
 - RoboMaster University Series (RMU), VANGUARD Team (2021.10–present)  
   - Co-founded and served as Vice Captain & vision/navigation lead.  
@@ -61,6 +60,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
   - Contributions include cone detection via OpenCV, 2D LiDAR mapping and navigation, fusion of vision and LiDAR for robust path following, and switching to TEB-based trajectory planning.  
 
 - Additional engineering practice  
+  - Familiar with UAV systems and industrial-grade UAV development (e.g., hybrid gasoline-electric UAVs), ArduPilot/PX4 ecosystem, and UAV command-and-control platform development.  
   - Notes and small experiments around Embodied AI and VLN courses / papers (some being cleaned up into blog posts).  
   - Containerized and cloud-based environments (Nextcloud, ROS, LLM services) using Docker.
 
@@ -139,7 +139,6 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
     - PX4 + MAVROS + Gazebo + QGC 无人机仿真环境搭建；  
     - 无人机平台搭建与集成；  
     - 上位机里程计、导航与决策模块开发。  
-  - 对无人机系统与行业级无人机研制较为熟悉（含油电混动无人机），熟悉 ArduPilot / PX4 生态，并参与过无人机管控平台的设计与开发。  
 
 - RoboMaster 机甲大师高校系列赛（RMU）（2021.10–至今）  
   - 负责共创并担任 VANGUARD 战队副队长，负责视觉与导航组工作。  
@@ -151,8 +150,10 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
   - 第十七届主要负责：OpenCV 锥桶识别、二维激光雷达建图与导航。  
   - 第十八届主要负责：项目进度推进，融合视觉与雷达实现稳定寻路，将路径规划算法改为 TEB，并调试高速运动下 GMapping 建图稳定性。  
 
-- 具身智能与 VLN 相关课程、论文的阅读笔记与小规模实验（部分会整理为博客文章）。  
-- 围绕 Nextcloud、ROS、LLM 等服务的 Docker 部署与调试实践，侧重工程环境搭建与自动化。
+- 其他工程实践经验：
+  - 对无人机系统与行业级无人机研制较为熟悉（含油电混动无人机），熟悉 ArduPilot / PX4 生态，并主持无人机管控平台的设计与开发。  
+  - 具身智能与 VLN 相关课程、论文的阅读笔记与小规模实验（部分会整理为博客文章）。  
+  - 围绕 Nextcloud、ROS、LLM 等服务的 Docker 部署与调试实践，侧重工程环境搭建与自动化。
 
 > 更多偏工程实践和配置相关的内容，可以在博客的文章列表中找到，对应标签如 `VLN`、`ROS_NOTE`、`Docker`、`LLM` 等。
 
