@@ -893,13 +893,13 @@
       }
     })();
     (function() {
-      const btn = document.getElementById('postReadingModeToggle');
+      const btn = document.getElementById('readingModeFab');
       if (!btn) return;
       const root = document.documentElement;
       const key = 'reading-mode';
       const apply = (on) => {
         root.classList.toggle('reading-mode', on);
-        btn.textContent = on ? '退出阅读模式' : '阅读模式';
+        btn.textContent = on ? '退' : '阅';
       };
       btn.addEventListener('click', () => {
         const next = !root.classList.contains('reading-mode');

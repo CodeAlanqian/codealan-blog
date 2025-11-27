@@ -13,7 +13,6 @@
         {{ end }}
       </p>
       <h1>{{ .Title }}</h1>
-      <button class="post-reading-mode-toggle" type="button" id="postReadingModeToggle">阅读模式</button>
       <p class="meta meta-views">
         <span class="icon-eye" aria-hidden="true">👁</span>
         <span class="view-count" data-key="{{ .RelPermalink }}">0</span> 次浏览 ·
@@ -87,4 +86,5 @@
       {{ end }}
     </footer>
   </article>
+  <button class="reading-mode-fab" type="button" id="readingModeFab" aria-label="切换阅读模式">阅</button>
 {{ end }}
