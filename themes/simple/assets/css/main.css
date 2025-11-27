@@ -742,6 +742,66 @@ a {
   transform: translateY(-1px);
 }
 
+.tag-roadmap {
+  margin: 12px 0 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.tag-roadmap-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tag-roadmap-subtitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.tag-roadmap-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  border-left: 1px solid var(--border);
+}
+
+.tag-roadmap-item {
+  position: relative;
+  padding: 6px 0 6px 14px;
+  font-size: 14px;
+}
+
+.tag-roadmap-item::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.tag-roadmap-date {
+  display: inline-block;
+  min-width: 90px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.tag-roadmap-link {
+  color: inherit;
+}
+
+.tag-roadmap-link:hover {
+  color: var(--accent);
+}
+
 .tag-pill.is-active {
   background: var(--accent);
   border-color: var(--accent);
@@ -880,6 +940,43 @@ a {
   transform: translateY(-1px);
 }
 
+.not-found-suggestions {
+  margin-top: 24px;
+}
+
+.not-found-suggestions h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.not-found-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.not-found-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.not-found-item a {
+  color: var(--accent);
+}
+
+.not-found-item a:hover {
+  text-decoration: underline;
+}
+
+.not-found-date {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 8px;
+}
+
 .post {
   background: var(--card);
   border: 1px solid var(--border);
@@ -904,6 +1001,69 @@ a {
 
 .post-footer {
   margin-top: 24px;
+}
+
+.post-feedback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+.post-like-btn,
+.post-donate-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.post-like-btn:hover,
+.post-donate-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.post-like-btn.is-liked {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.post-donate-popup {
+  position: relative;
+  display: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.3);
+  margin-top: 4px;
+}
+
+.post-donate-popup.is-open {
+  display: inline-block;
+}
+
+.post-donate-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.post-donate-img {
+  max-width: 200px;
+  height: auto;
+  display: block;
 }
 
 .post-nav {

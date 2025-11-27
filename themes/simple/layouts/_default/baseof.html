@@ -299,6 +299,59 @@
       });
     })();
     (function() {
+      const likeBtn = document.getElementById('postLikeBtn');
+      const likeCountEl = document.getElementById('postLikeCount');
+      const donateBtn = document.getElementById('postDonateBtn');
+      const donatePopup = document.getElementById('postDonatePopup');
+      if (!likeBtn && !donateBtn) return;
+      const path = window.location.pathname || '/';
+      const likeKey = 'like:' + path;
+
+      const updateLikeCount = (count) => {
+        if (likeCountEl && typeof count === 'number' && !Number.isNaN(count)) {
+          likeCountEl.textContent = String(count);
+        }
+      };
+
+      if (likeBtn && likeCountEl) {
+        const liked = !!localStorage.getItem(likeKey);
+        if (liked) {
+          likeBtn.classList.add('is-liked');
+        }
+        fetch('/api/likes/get?path=' + encodeURIComponent(path))
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && typeof data.count === 'number') {
+              updateLikeCount(data.count);
+            }
+          })
+          .catch(() => {});
+
+        likeBtn.addEventListener('click', () => {
+          if (likeBtn.classList.contains('is-liked')) return;
+          likeBtn.classList.add('is-liked');
+          localStorage.setItem(likeKey, '1');
+          fetch('/api/likes/hit?path=' + encodeURIComponent(path), { method: 'POST' })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+              if (data && typeof data.count === 'number') {
+                updateLikeCount(data.count);
+              }
+            })
+            .catch(() => {
+              const current = parseInt(likeCountEl.textContent || '0', 10) || 0;
+              updateLikeCount(current + 1);
+            });
+        });
+      }
+
+      if (donateBtn && donatePopup) {
+        donateBtn.addEventListener('click', () => {
+          donatePopup.classList.toggle('is-open');
+        });
+      }
+    })();
+    (function() {
       const btn = document.getElementById('postPptBtn');
       if (!btn) return;
       const content = document.querySelector('.post .content');

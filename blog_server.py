@@ -84,13 +84,18 @@ class ViewHitResponse(BaseModel):
     count: int
 
 
+class LikeResponse(BaseModel):
+    path: str
+    count: int
+
+
 _DB_LOCK = threading.Lock()
 _DB_PATH = Path(__file__).resolve().parent / "views.db"
 
 
 def _init_db() -> None:
     """
-    初始化（或确保存在）SQLite 数据库和 views 表。
+    初始化（或确保存在）SQLite 数据库和统计表。
     """
     with _DB_LOCK:
         conn = sqlite3.connect(_DB_PATH)
@@ -98,6 +103,14 @@ def _init_db() -> None:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS views (
+                    path TEXT PRIMARY KEY,
+                    count INTEGER NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS likes (
                     path TEXT PRIMARY KEY,
                     count INTEGER NOT NULL
                 )
@@ -132,6 +145,51 @@ def _increment_view(path: str) -> int:
                 )
             conn.commit()
             return count
+        finally:
+            conn.close()
+
+
+def _increment_like(path: str) -> int:
+    """
+    将指定 path 的“点赞”次数 +1，并返回最新总数。
+    """
+    if not path:
+        path = "/"
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT count FROM likes WHERE path = ?", (path,))
+            row = cur.fetchone()
+            if row is None:
+                count = 1
+                cur.execute(
+                    "INSERT INTO likes (path, count) VALUES (?, ?)", (path, count)
+                )
+            else:
+                count = int(row[0]) + 1
+                cur.execute(
+                    "UPDATE likes SET count = ? WHERE path = ?", (count, path)
+                )
+            conn.commit()
+            return count
+        finally:
+            conn.close()
+
+
+def _get_like_count(path: str) -> int:
+    """
+    返回指定 path 的点赞总数（不存在则为 0）。
+    """
+    if not path:
+        path = "/"
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT count FROM likes WHERE path = ?", (path,))
+            row = cur.fetchone()
+            return int(row[0]) if row is not None else 0
         finally:
             conn.close()
 
@@ -229,6 +287,26 @@ async def hit_view(path: str) -> ViewHitResponse:
     """
     count = _increment_view(path)
     return ViewHitResponse(path=path, count=count)
+
+
+@app.post("/api/likes/hit", response_model=LikeResponse)
+async def hit_like(path: str) -> LikeResponse:
+    """
+    记录某个页面收到一次「觉得有用」，返回所有用户的累计点赞次数。
+    - 参数 path：通常使用 Hugo 的 .RelPermalink，例如 /posts/xxx/。
+    - 前端负责使用 localStorage 限制同一浏览器重复点击。
+    """
+    count = _increment_like(path)
+    return LikeResponse(path=path, count=count)
+
+
+@app.get("/api/likes/get", response_model=LikeResponse)
+async def get_like(path: str) -> LikeResponse:
+    """
+    获取某个页面的累计点赞次数。
+    """
+    count = _get_like_count(path)
+    return LikeResponse(path=path, count=count)
 
 
 if __name__ == "__main__":

@@ -8,5 +8,19 @@
     <a class="btn" href="{{ "/" | relURL }}">返回首页</a>
     <a class="btn ghost" href="{{ "/search/" | relURL }}">去搜索一下</a>
   </section>
+  {{ $pages := where site.RegularPages "Type" "in" (slice "posts" "obsidian") }}
+  {{ $recent := first 6 ($pages.ByDate.Reverse) }}
+  {{ if gt (len $recent) 0 }}
+    <section class="not-found-suggestions">
+      <h2>你也可以看看这些文章</h2>
+      <ul class="not-found-list">
+        {{ range $recent }}
+          <li class="not-found-item">
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            <span class="not-found-date">{{ .Date.Format "2006-01-02" }}</span>
+          </li>
+        {{ end }}
+      </ul>
+    </section>
+  {{ end }}
 {{ end }}
-

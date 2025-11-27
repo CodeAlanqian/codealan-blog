@@ -38,6 +38,18 @@
       </div>
     </div>
     <footer class="post-footer">
+      <section class="post-feedback">
+        <button class="post-like-btn" type="button" id="postLikeBtn">
+          👍 觉得有用 · <span id="postLikeCount">0</span>
+        </button>
+        <button class="post-donate-btn" type="button" id="postDonateBtn">
+          ☕ 请我喝杯咖啡
+        </button>
+        <div class="post-donate-popup" id="postDonatePopup">
+          <p class="post-donate-title">微信扫码赞赏</p>
+          <img src="{{ "/Buy Me a Coffee.jpg" | relURL }}" alt="WeChat QR code" class="post-donate-img">
+        </div>
+      </section>
       <nav class="post-nav">
         {{ with .Prev }}
           <a class="post-nav-link prev" href="{{ .RelPermalink }}">← {{ .Title }}</a>

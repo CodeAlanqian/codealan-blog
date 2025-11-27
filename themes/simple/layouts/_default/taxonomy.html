@@ -9,6 +9,23 @@
     <p class="lede">共 {{ $paginator.TotalNumberOfElements }} 篇文章</p>
     {{ with .Content }}<div class="lede">{{ . }}</div>{{ end }}
   </section>
+  {{ if $isTag }}
+    {{ $all := .Pages.ByDate }}
+    {{ if gt (len $all) 0 }}
+      <section class="tag-roadmap">
+        <p class="tag-roadmap-title">知识路线图</p>
+        <p class="tag-roadmap-subtitle">按时间大致梳理与「{{ .Title }}」相关的文章，可作为学习路线的参考。</p>
+        <ol class="tag-roadmap-list">
+          {{ range $all }}
+            <li class="tag-roadmap-item">
+              <span class="tag-roadmap-date">{{ .Date.Format "2006-01-02" }}</span>
+              <a class="tag-roadmap-link" href="{{ .RelPermalink }}">{{ .Title }}</a>
+            </li>
+          {{ end }}
+        </ol>
+      </section>
+    {{ end }}
+  {{ end }}
   <section class="post-list">
     {{ range $paginator.Pages }}
       {{ partial "article-card.html" . }}
