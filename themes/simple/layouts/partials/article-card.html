@@ -25,32 +25,8 @@
         {{ end }}
       {{ end }}
     {{ end }}
-    {{ with $cover }}
-      <div class="card-cover">
-        <img src="{{ . | relURL }}" alt="{{ $.Title }}">
-      </div>
-    {{ end }}
     <div class="card-main">
       <div class="card-head">
-      {{ $cover := .Params.cover }}
-      {{ if not $cover }}
-        {{ with .Resources.ByType "image" }}
-          {{ with .GetMatch "*" }}
-            {{ $cover = .RelPermalink }}
-          {{ end }}
-        {{ end }}
-      {{ end }}
-      {{ if not $cover }}
-        {{ $imgs := findRE "<img[^>]+src=\\\"([^\\\"]+)\\\"" .Content 1 }}
-        {{ if gt (len $imgs) 0 }}
-          {{ $m := index $imgs 0 }}
-          {{ $srcMatch := findRE "src=\\\"([^\\\"]+)\\\"" $m 1 }}
-          {{ if gt (len $srcMatch) 0 }}
-            {{ $raw := index $srcMatch 0 }}
-            {{ $cover = (replace (replace $raw "src=\"" "") "\"" "") }}
-          {{ end }}
-        {{ end }}
-      {{ end }}
       <h2>{{ .Title }}</h2>
       <p class="meta">
         {{ .Date.Format "2006-01-02" }}
@@ -60,7 +36,12 @@
           {{ end }}
         {{ end }}
       </p>
-      {{ $summary := .Summary | plainify | truncate 180 }}
+      {{ with $cover }}
+        <div class="card-cover">
+          <img src="{{ . | relURL }}" alt="{{ $.Title }}">
+        </div>
+      {{ end }}
+      {{ $summary := .Summary | plainify | truncate 260 }}
       {{ if not $summary }}{{ $summary = .Plain | plainify | truncate 180 }}{{ end }}
       <p class="summary">{{ $summary }}</p>
     </div>

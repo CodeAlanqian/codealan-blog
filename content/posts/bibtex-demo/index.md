@@ -6,6 +6,7 @@ tags:
 - Zotero
 - Notes
 - BibTeX
+- 示例
 ---
 
 本文演示如何在博客中为论文笔记添加 BibTeX 悬停预览与一键跳转。

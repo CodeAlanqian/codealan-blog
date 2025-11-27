@@ -523,8 +523,7 @@ a {
 }
 
 .card-link {
-  display: flex;
-  gap: 14px;
+  display: block;
   padding: 18px 20px;
   height: 100%;
   width: 100%;
@@ -534,7 +533,6 @@ a {
 }
 
 .card-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -547,15 +545,14 @@ a {
 }
 
 .card-cover {
-  flex: 0 0 150px;
   border-radius: 10px;
   text-align: center;
-  padding: 6px 0;
+  padding: 8px 0 10px;
 }
 
 .card-cover img {
   max-width: 100%;
-  max-height: 160px;
+  max-height: 220px;
   display: block;
   margin: 0 auto;
   object-fit: contain;
@@ -575,21 +572,6 @@ a {
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
-}
-
-@media (max-width: 720px) {
-  .card-link {
-    flex-direction: column;
-  }
-  .card-cover {
-    flex-basis: auto;
-    text-align: center;
-    padding: 4px 0 8px;
-  }
-  .card-cover img {
-    max-height: 180px;
-    width: 100%;
-  }
 }
 
 .meta {
