@@ -7,6 +7,8 @@ tags:
 - Navigation
 ---
 
+<span class="view-count academic-view-count" data-key="/academic/" aria-hidden="true">0</span>
+
 <div style="display:flex; justify-content:center; margin-bottom: 1.5rem;">
   <img src="/gyq.jpg" alt="Yiqian Gong portrait" style="width:160px; height:160px; border-radius:50%; object-fit:cover; box-shadow:0 8px 24px rgba(15,23,42,0.18); border:2px solid #e2e8f0;">
 </div>

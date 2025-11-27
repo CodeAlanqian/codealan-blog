@@ -1338,7 +1338,8 @@ a {
   gap: 8px;
 }
 
-.home-view-count {
+.home-view-count,
+.academic-view-count {
   display: none;
 }
 
