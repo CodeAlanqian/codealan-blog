@@ -4,24 +4,25 @@
     {{ $dataTags = $dataTags | append (. | urlize) }}
   {{ end }}
 {{ end }}
-{{/* 简单推断文章类型：研究笔记 / 实战教程 / 随笔 */}}
-{{ $typeLabel := "" }}
+{{/* 简单推断文章类型：研究笔记 / 实战教程 / 论文笔记 / 随笔 */}}
+{{ $typeLabel := "随笔 / 记录" }}
 {{ $tagsLower := slice }}
 {{ with .Params.tags }}
   {{ range . }}
     {{ $tagsLower = $tagsLower | append (lower .) }}
   {{ end }}
 {{ end }}
-{{ if in $tagsLower "ros_note" }}
+{{ $contentType := "" }}
+{{ with .Params.type }}
+  {{ $contentType = lower (printf "%v" .) }}
+{{ end }}
+{{ $isPaper := or (in $tagsLower "zotero") (in $tagsLower "obscite") (in $tagsLower "paper") (in $tagsLower "论文") }}
+{{ if or $isPaper (in $contentType "paper") (in $contentType "conferencepaper") }}
+  {{ $typeLabel = "论文 / 文献笔记" }}
+{{ else if or (in $tagsLower "ros_note") (in $tagsLower "vln") (in $tagsLower "llm") }}
   {{ $typeLabel = "研究笔记" }}
 {{ else if or (in $tagsLower "docker") (in $tagsLower "ubuntu") (in $tagsLower "security") (in $tagsLower "nextcloud") }}
   {{ $typeLabel = "实战教程" }}
-{{ else if in $tagsLower "vln" }}
-  {{ $typeLabel = "研究笔记" }}
-{{ else if in $tagsLower "llm" }}
-  {{ $typeLabel = "研究笔记" }}
-{{ else }}
-  {{ $typeLabel = "随笔 / 记录" }}
 {{ end }}
 <article class="card"{{ if gt (len $dataTags) 0 }} data-tags="{{ delimit $dataTags "," }}"{{ end }}>
   <a class="card-link" href="{{ .RelPermalink }}">

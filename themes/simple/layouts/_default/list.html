@@ -108,6 +108,27 @@
         {{- range $pages }}
           titleMap.set({{ .RelPermalink | jsonify }}, {{ .Title | jsonify }});
         {{- end }}
+        const resolveTitle = (rawPath) => {
+          if (!rawPath) return '';
+          let path = rawPath;
+          try {
+            const u = new URL(rawPath, window.location.origin);
+            path = u.pathname || rawPath;
+          } catch (e) {}
+          if (titleMap.has(path)) return titleMap.get(path);
+          if (!path.endsWith('/')) {
+            const withSlash = path + '/';
+            if (titleMap.has(withSlash)) return titleMap.get(withSlash);
+          }
+          const parts = path.split('/').filter(Boolean);
+          if (parts.length > 0) {
+            const slug = decodeURIComponent(parts[parts.length - 1] || '')
+              .replace(/[-_]+/g, ' ')
+              .trim();
+            if (slug) return slug;
+          }
+          return rawPath;
+        };
         const renderTop = (id, items) => {
           const el = document.getElementById(id);
           if (!el) return;
@@ -116,7 +137,7 @@
             return;
           }
           el.innerHTML = items.map((item) => {
-            const title = titleMap.get(item.path) || item.path;
+            const title = resolveTitle(item.path);
             return '<li class="home-top-item"><a href="' + item.path + '">' + title + '</a><span class="home-top-count">' + item.count + '</span></li>';
           }).join('');
         };
