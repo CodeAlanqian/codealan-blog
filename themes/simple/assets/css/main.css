@@ -1310,14 +1310,20 @@ a {
 }
 
 .home-top-panel {
-  margin: 18px 0 8px;
-  padding: 12px 14px;
+  margin: 18px 0 6px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--card);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 880px) {
+  .home-top-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .home-top-block {
@@ -1325,26 +1331,31 @@ a {
 }
 
 .home-top-title {
-  margin: 0 0 4px;
-  font-size: 15px;
+  margin: 0 0 2px;
+  font-size: 14px;
 }
 
 .home-top-list {
   list-style: none;
   padding-left: 0;
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .home-top-item {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .home-top-item a {
   color: var(--accent);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .home-top-item a:hover {
@@ -1352,7 +1363,7 @@ a {
 }
 
 .home-top-count {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   margin-left: 8px;
 }
