@@ -542,6 +542,13 @@ a {
   width: 100%;
   border-radius: 10px;
   overflow: hidden;
+  max-height: 160px;
+}
+
+@media (min-width: 900px) {
+  .card-cover {
+    max-height: 110px;
+  }
 }
 
 .card-cover img {
@@ -1078,6 +1085,8 @@ a {
 .katex-display {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  position: relative;
+  padding-right: 28px;
 }
 
 @media (max-width: 640px) {
@@ -1160,6 +1169,25 @@ a {
 .ai-mindmap-edge {
   stroke: rgba(148, 163, 184, 0.7);
   stroke-width: 1;
+}
+
+.math-copy-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 11px;
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.math-copy-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .bibref {

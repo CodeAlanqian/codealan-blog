@@ -24,7 +24,7 @@ About VLM
 
 https://mp.weixin.qq.com/s/cTOPdjYscWUZyag5I_un0g
 
-![](/obsidian/assets/Notes%2520of%2520Research/file-20251117210426523.png)
+![](/static/obsidian/assets/Notes%20of%20Research/file-20251117210426523.png)
 
 
 [第37期 手把手教程！zotero和obsidian如何联动](https://mp.weixin.qq.com/s?__biz=MzkwMDYxODg5MA==&mid=2247487928&idx=1&sn=2033516aec49f5cd45e3826e702ca4db&chksm=c0401e5df737974ba546f8397c8201f44572f6908fe275f26fdd2804ae1b59dd59ed091d6ec7&scene=21#wechat_redirect)
@@ -43,15 +43,15 @@ See, Point, Fly
 
 ### BibTeX 引用示例（悬停预览）
 
-在论文笔记中，可以使用 `bibref` shortcode 为文献添加悬停预览的 BibTeX 引用，例如：
+在论文笔记中，可以使用 `bibref` shortcode 为文献添加悬停预览的 BibTeX 引用，例如当前这一条：
 
-{{</* bibref title="AerialVLN: Vision-and-Language Navigation for UAVs" url="https://arxiv.org/abs/2403.12345" */>}}
+{{< bibref title="AerialVLN: Vision-and-Language Navigation for UAVs" url="https://arxiv.org/abs/2403.12345" >}}
 @inproceedings{liu2023aerialvln,
   title={AerialVLN: Vision-and-Language Navigation for UAVs},
   author={Liu, A. and Others},
   booktitle={Proceedings of the 2023 IEEE International Conference on Robotics and Automation (ICRA)},
   year={2023}
 }
-{{</* /bibref */>}}
+{{< /bibref >}}
 
-将上面代码片段放入任意 Markdown 文章中，在页面中悬停标题即可看到 BibTeX 预览，点击标题会跳转到对应的 PDF 或 arXiv 页面。
+在页面中悬停上述标题即可看到 BibTeX 预览，点击标题会跳转到对应的 PDF 或 arXiv 页面。

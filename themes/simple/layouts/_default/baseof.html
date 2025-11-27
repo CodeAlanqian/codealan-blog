@@ -882,6 +882,42 @@
         strict: 'ignore',
         ignoredTags: ['script', 'noscript', 'style', 'textarea']
       });
+      try {
+        const blocks = renderTarget.querySelectorAll('.katex-display');
+        blocks.forEach((block) => {
+          if (block.querySelector('.math-copy-btn')) return;
+          const ann = block.querySelector('.katex-mathml annotation[encoding="application/x-tex"]');
+          if (!ann) return;
+          const tex = (ann.textContent || '').trim();
+          if (!tex) return;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'math-copy-btn';
+          btn.textContent = '复制';
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const write = navigator.clipboard && navigator.clipboard.writeText
+              ? navigator.clipboard.writeText(tex)
+              : Promise.reject();
+            write.then(() => {
+              btn.textContent = '已复制';
+              setTimeout(() => { btn.textContent = '复制'; }, 1200);
+            }).catch(() => {
+              try {
+                const textarea = document.createElement('textarea');
+                textarea.value = tex;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = '已复制';
+                setTimeout(() => { btn.textContent = '复制'; }, 1200);
+              } catch (e) {}
+            });
+          });
+          block.appendChild(btn);
+        });
+      } catch (e) {}
     }
     {{ end }}
   </script>
