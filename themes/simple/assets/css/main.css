@@ -1025,6 +1025,52 @@ a {
   gap: 12px;
 }
 
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+
+.search-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.search-filter-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.search-filter-select,
+.search-filter-date {
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+
+.search-filter-select:focus,
+.search-filter-date:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-filter-dates {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-filter-sep {
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .content img {
   max-width: 100%;
 }

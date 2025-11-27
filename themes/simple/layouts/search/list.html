@@ -2,7 +2,7 @@
   <section class="hero">
     <p class="eyebrow">搜索</p>
     <h1>{{ .Title }}</h1>
-    <p class="lede">输入标题、标签或内容关键字，实时筛选文章。</p>
+    <p class="lede">输入标题、标签或内容关键字，支持实时筛选、标签与时间范围过滤。</p>
   </section>
   <section class="search-box">
     <input
@@ -12,6 +12,25 @@
       placeholder="搜索站内文章…"
       autocomplete="off"
     >
+  </section>
+  <section class="search-filters">
+    <div class="search-filter-group">
+      <label class="search-filter-label" for="searchTagFilter">标签</label>
+      <select id="searchTagFilter" class="search-filter-select">
+        <option value="">全部标签</option>
+        {{ range $name, $_ := site.Taxonomies.tags }}
+          <option value="{{ $name | urlize }}">{{ $name }}</option>
+        {{ end }}
+      </select>
+    </div>
+    <div class="search-filter-group">
+      <label class="search-filter-label" for="searchDateStart">时间</label>
+      <div class="search-filter-dates">
+        <input type="date" id="searchDateStart" class="search-filter-date">
+        <span class="search-filter-sep">–</span>
+        <input type="date" id="searchDateEnd" class="search-filter-date">
+      </div>
+    </div>
   </section>
   <section class="search-results" id="searchResults">
     <p class="search-hint">开始输入以查看搜索结果。</p>
@@ -36,26 +55,48 @@
     (function() {
       const input = document.getElementById('searchInput');
       const resultsEl = document.getElementById('searchResults');
+      const tagSelect = document.getElementById('searchTagFilter');
+      const dateStart = document.getElementById('searchDateStart');
+      const dateEnd = document.getElementById('searchDateEnd');
       if (!input || !resultsEl || !SEARCH_PAGES) return;
       const pages = Array.isArray(SEARCH_PAGES) ? SEARCH_PAGES : JSON.parse(SEARCH_PAGES);
-      const renderResults = (items, query) => {
+      const escapeHtml = (s) => (s || '').toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      const escapeRegex = (s) => (s || '').toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const renderResults = (items, tokens) => {
         if (!items.length) {
           resultsEl.innerHTML = '<p class="search-hint">没有找到匹配的文章。</p>';
           return;
         }
+        const hasTokens = tokens && tokens.length > 0;
+        let pattern = null;
+        if (hasTokens) {
+          const parts = tokens.map(escapeRegex);
+          pattern = new RegExp('(' + parts.join('|') + ')', 'gi');
+        }
+        const highlight = (text) => {
+          const safe = escapeHtml(text || '');
+          if (!pattern) return safe;
+          return safe.replace(pattern, '<mark>$1</mark>');
+        };
         const html = items.map(item => {
           const tags = (item.tags || []).map(t => {
             const key = (t || '').toString().toLowerCase().replace(/\s+/g, '_');
             return '<span class="tag" data-tag-key="' + key + '">' + t + '</span>';
           }).join('');
+          const titleHtml = highlight(item.title || '');
+          const summaryHtml = item.summary ? highlight(item.summary) : '';
           return (
             '<article class="card">' +
               '<a class="card-link" href="' + item.url + '">' +
                 '<div class="card-head">' +
-                  '<h2>' + item.title + '</h2>' +
+                  '<h2>' + titleHtml + '</h2>' +
                   '<p class="meta">' + item.date + (tags ? ' ' + tags : '') + '</p>' +
                 '</div>' +
-                (item.summary ? '<p class="summary">' + item.summary + '</p>' : '') +
+                (summaryHtml ? '<p class="summary">' + summaryHtml + '</p>' : '') +
               '</a>' +
             '</article>'
           );
@@ -63,7 +104,19 @@
         resultsEl.innerHTML = '<div class="search-result-list">' + html + '</div>';
       };
       const normalize = (s) => (s || '').toString().toLowerCase();
+      const normalizeTag = (s) => normalize(s).replace(/\s+/g, '_');
       const tokenize = (q) => normalize(q).split(/[\s\u3000]+/).filter(Boolean);
+
+      const fuzzyRank = (text, tok) => {
+        if (!text || !tok) return 0;
+        if (text.includes(tok)) return 2;
+        // 简单子序列匹配，容忍少量拼写偏差
+        let ti = 0;
+        for (let i = 0; i < text.length && ti < tok.length; i++) {
+          if (text[i] === tok[ti]) ti++;
+        }
+        return ti === tok.length ? 1 : 0;
+      };
 
       const scorePage = (page, tokens) => {
         if (!tokens.length) return 0;
@@ -72,22 +125,33 @@
         const tagsText = normalize((page.tags || []).join(' '));
         let score = 0;
         for (const tok of tokens) {
-          let hit = false;
-          if (title.includes(tok)) {
-            score += 5;
-            hit = true;
-          }
-          if (tagsText.includes(tok)) {
-            score += 3;
-            hit = true;
-          }
-          if (summary.includes(tok)) {
-            score += 1;
-            hit = true;
-          }
-          if (!hit) return 0;
+          let fieldScore = 0;
+          fieldScore += fuzzyRank(title, tok) * 5;
+          fieldScore += fuzzyRank(tagsText, tok) * 3;
+          fieldScore += fuzzyRank(summary, tok) * 1;
+          if (fieldScore === 0) return 0;
+          score += fieldScore;
         }
         return score;
+      };
+
+      const matchFilters = (page) => {
+        const ts = (page.ts || 0) * 1000;
+        if (tagSelect && tagSelect.value) {
+          const target = tagSelect.value;
+          const tags = page.tags || [];
+          const ok = tags.some(t => normalizeTag(t) === target);
+          if (!ok) return false;
+        }
+        if (dateStart && dateStart.value) {
+          const startTs = Date.parse(dateStart.value);
+          if (!isNaN(startTs) && ts < startTs) return false;
+        }
+        if (dateEnd && dateEnd.value) {
+          const endTs = Date.parse(dateEnd.value);
+          if (!isNaN(endTs) && ts > endTs + 24 * 3600 * 1000 - 1) return false;
+        }
+        return true;
       };
 
       // 默认展示最近文章，画面不空
@@ -95,16 +159,21 @@
         .slice()
         .sort((a, b) => (b.ts || 0) - (a.ts || 0))
         .slice(0, 10);
-      renderResults(initial, '');
+      renderResults(initial, []);
 
-      const onInput = () => {
+      const runSearch = () => {
         const q = input.value;
         const tokens = tokenize(q);
+        let pool = pages.filter(matchFilters);
         if (!tokens.length) {
-          renderResults(initial, '');
+          pool = pool
+            .slice()
+            .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+            .slice(0, 50);
+          renderResults(pool, []);
           return;
         }
-        const results = pages
+        const results = pool
           .map(p => ({ page: p, score: scorePage(p, tokens) }))
           .filter(x => x.score > 0)
           .sort((a, b) => {
@@ -113,9 +182,13 @@
           })
           .slice(0, 50)
           .map(x => x.page);
-        renderResults(results, q);
+        renderResults(results, tokens);
       };
-      input.addEventListener('input', onInput);
+
+      input.addEventListener('input', runSearch);
+      if (tagSelect) tagSelect.addEventListener('change', runSearch);
+      if (dateStart) dateStart.addEventListener('change', runSearch);
+      if (dateEnd) dateEnd.addEventListener('change', runSearch);
       // 自动聚焦提高体验
       setTimeout(() => input.focus(), 200);
     })();

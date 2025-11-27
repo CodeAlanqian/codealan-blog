@@ -3,7 +3,9 @@
   {{ $isTag := eq $kind "tag" }}
   {{ $isSeries := eq $kind "series" }}
   <section class="hero">
-    <p class="eyebrow">{{ if $isTag }}标签{{ else if $isSeries }}专栏{{ else }}分类{{ end }}</p>
+    {{ if not $isTag }}
+    <p class="eyebrow">{{ if $isSeries }}专栏{{ else }}分类{{ end }}</p>
+    {{ end }}
     <h1>{{ if $isTag }}全部标签{{ else if $isSeries }}全部专栏{{ else }}全部分类{{ end }}</h1>
     <p class="lede">共 {{ len .Data.Terms }} 个{{ if $isTag }}标签{{ else if $isSeries }}专栏{{ else }}分类{{ end }}</p>
   </section>
