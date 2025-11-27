@@ -13,7 +13,7 @@ ignoreFiles:
   - "\\.git/"
 
 params:
-  description: "记录具身智能、VLN 学习与开发折腾的日常。"
+  description: "记录 UAV / 具身智能 / VLN 的学习与实践。"
   author: "CodeAlan"
 
 permalinks:
