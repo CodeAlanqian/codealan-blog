@@ -892,6 +892,27 @@
         });
       }
     })();
+    (function() {
+      const btn = document.getElementById('postReadingModeToggle');
+      if (!btn) return;
+      const root = document.documentElement;
+      const key = 'reading-mode';
+      const apply = (on) => {
+        root.classList.toggle('reading-mode', on);
+        btn.textContent = on ? '退出阅读模式' : '阅读模式';
+      };
+      btn.addEventListener('click', () => {
+        const next = !root.classList.contains('reading-mode');
+        apply(next);
+        try {
+          localStorage.setItem(key, next ? '1' : '0');
+        } catch (e) {}
+      });
+      try {
+        const saved = localStorage.getItem(key);
+        if (saved === '1') apply(true);
+      } catch (e) {}
+    })();
     {{ if .Params.math }}
     if (typeof renderMathInElement === 'function') {
       const renderTarget = document.querySelector('.post .content') || document.body;

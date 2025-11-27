@@ -1455,6 +1455,35 @@ a {
   box-shadow: 0 16px 38px rgba(15, 23, 42, 0.06);
 }
 
+.reading-mode .site-header,
+.reading-mode .site-footer,
+.reading-mode .ai-chat-widget,
+.reading-mode .back-top,
+.reading-mode .reading-progress {
+  display: none !important;
+}
+
+.reading-mode .toc {
+  display: none;
+}
+
+.reading-mode .site-main {
+  max-width: 960px;
+}
+
+.reading-mode .post {
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.reading-mode .post .content {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
 .post-header h1 {
   margin: 6px 0 12px;
 }
@@ -1464,6 +1493,30 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 10px;
+}
+
+.post-reading-mode-toggle {
+  margin-top: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.post-reading-mode-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.reading-mode .post-reading-mode-toggle {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: #22c55e;
+  color: #16a34a;
 }
 
 .post .cover img {
@@ -1772,6 +1825,15 @@ a {
   -webkit-overflow-scrolling: touch;
   position: relative;
   padding-right: 28px;
+}
+
+.katex-display::-webkit-scrollbar {
+  height: 6px;
+}
+
+.katex-display::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
 }
 
 @media (max-width: 640px) {
