@@ -94,6 +94,9 @@ class StatItem(BaseModel):
     count: int
 
 
+class TotalViewsResponse(BaseModel):
+    total: int
+
 _DB_LOCK = threading.Lock()
 _DB_PATH = Path(__file__).resolve().parent / "views.db"
 
@@ -332,6 +335,23 @@ def _get_top_stats(table: str, limit: int = 5) -> List[StatItem]:
             conn.close()
 
 
+def _get_total_views() -> int:
+    """
+    返回所有页面浏览量之和（不存在记录时为 0）。
+    """
+    with _DB_LOCK:
+        conn = sqlite3.connect(_DB_PATH)
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT SUM(count) FROM views")
+            row = cur.fetchone()
+            if not row or row[0] is None:
+                return 0
+            return int(row[0])
+        finally:
+            conn.close()
+
+
 @app.get("/api/stats/top-views", response_model=List[StatItem])
 async def top_views(limit: int = 5) -> List[StatItem]:
     """
@@ -350,6 +370,15 @@ async def top_likes(limit: int = 5) -> List[StatItem]:
     if limit <= 0:
         limit = 5
     return _get_top_stats("likes", limit)
+
+
+@app.get("/api/stats/total-views", response_model=TotalViewsResponse)
+async def total_views() -> TotalViewsResponse:
+    """
+    获取全站浏览量总和。
+    """
+    total = _get_total_views()
+    return TotalViewsResponse(total=total)
 
 
 if __name__ == "__main__":

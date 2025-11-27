@@ -41,7 +41,13 @@
         <h2 class="home-top-title">👍 点赞 Top</h2>
         <ul class="home-top-list" id="homeTopLikes"></ul>
       </div>
-      <p class="home-top-hint">统计来自站内服务端浏览量 / 点赞数据。</p>
+      <div class="home-top-footer">
+        <p class="home-top-hint">统计来自站内服务端浏览量 / 点赞数据。</p>
+        <p class="home-top-total">
+          👁️ 全站总浏览量：
+          <span id="homeTotalViews">--</span>
+        </p>
+      </div>
     </section>
     <section class="home-topics">
       <h2 class="home-topics-title">📚 精选专题</h2>
@@ -141,6 +147,27 @@
             return '<li class="home-top-item"><a href="' + item.path + '">' + title + '</a><span class="home-top-count">' + item.count + '</span></li>';
           }).join('');
         };
+        const renderTotal = (total) => {
+          const el = document.getElementById('homeTotalViews');
+          if (!el) return;
+          if (typeof total !== 'number' || Number.isNaN(total)) {
+            el.textContent = '--';
+            return;
+          }
+          el.textContent = String(total);
+        };
+        fetch('/api/stats/total-views')
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && typeof data.total === 'number') {
+              renderTotal(data.total);
+            } else {
+              renderTotal(NaN);
+            }
+          })
+          .catch(() => {
+            renderTotal(NaN);
+          });
         fetch('/api/stats/top-views?limit=5')
           .then((res) => res.ok ? res.json() : null)
           .then((data) => renderTop('homeTopViews', data))
