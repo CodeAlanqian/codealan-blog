@@ -707,10 +707,10 @@
         const toggle = document.createElement('button');
         toggle.type = 'button';
         toggle.className = 'code-toggle';
-        toggle.textContent = '⮟ SHOW CODE';
+        toggle.textContent = 'Show code';
         toggle.addEventListener('click', () => {
           const collapsed = block.classList.toggle('collapsed');
-          toggle.textContent = collapsed ? '⮟ SHOW CODE' : '⮝ HIDE CODE';
+          toggle.textContent = collapsed ? 'Show code' : 'Hide code';
         });
         block.parentNode.insertBefore(toggle, block.nextSibling);
         block.dataset.hasCodeToggle = 'true';
