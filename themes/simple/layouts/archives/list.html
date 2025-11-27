@@ -108,13 +108,7 @@
     {{ end }}
   </section>
   <script>
-    const ARCHIVE_PAGES = (function() {
-      {{- $items := slice -}}
-      {{- range $pages -}}
-        {{- $items = $items | append (dict "path" .RelPermalink "title" .Title) -}}
-      {{- end -}}
-      return {{ $items | jsonify }};
-    })();
+    const ARCHIVE_PAGES = JSON.parse({{ $items := slice }}{{ range $pages }}{{ $items = $items | append (dict "path" .RelPermalink "title" .Title) }}{{ end }}{{ $items | jsonify }});
     (function() {
       const years = document.querySelectorAll('.archive-year');
       years.forEach((year) => {
