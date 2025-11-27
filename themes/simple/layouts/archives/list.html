@@ -132,6 +132,27 @@
           map.set(p.path, p.title || p.path);
         }
       });
+      const resolveTitle = (rawPath) => {
+        if (!rawPath) return '';
+        let path = rawPath;
+        try {
+          const u = new URL(rawPath, window.location.origin);
+          path = u.pathname || rawPath;
+        } catch (e) {}
+        if (map.has(path)) return map.get(path);
+        if (!path.endsWith('/')) {
+          const withSlash = path + '/';
+          if (map.has(withSlash)) return map.get(withSlash);
+        }
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length > 0) {
+          const slug = decodeURIComponent(parts[parts.length - 1] || '')
+            .replace(/[-_]+/g, ' ')
+            .trim();
+          if (slug) return slug;
+        }
+        return rawPath;
+      };
       const renderTop = (id, items) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -140,10 +161,9 @@
           return;
         }
         const html = items.map((item) => {
-          const title = map.get(item.path) || item.path;
-          const safeTitle = title;
           const href = item.path;
-          return '<li class="archive-top-item"><a href="' + href + '">' + safeTitle + '</a><span class="archive-top-count">' + item.count + '</span></li>';
+          const title = resolveTitle(href);
+          return '<li class="archive-top-item"><a href="' + href + '">' + title + '</a><span class="archive-top-count">' + item.count + '</span></li>';
         }).join('');
         el.innerHTML = html;
       };
