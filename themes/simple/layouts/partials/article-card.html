@@ -7,6 +7,11 @@
 <article class="card"{{ if gt (len $dataTags) 0 }} data-tags="{{ delimit $dataTags "," }}"{{ end }}>
   <a class="card-link" href="{{ .RelPermalink }}">
     <div class="card-head">
+      {{ with .Params.cover }}
+        <div class="card-cover">
+          <img src="{{ . | relURL }}" alt="{{ $.Title }}">
+        </div>
+      {{ end }}
       <h2>{{ .Title }}</h2>
       <p class="meta">
         {{ .Date.Format "2006-01-02" }}

@@ -518,7 +518,6 @@ a {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
   margin: 0;
   max-width: 100%;
 }
@@ -531,6 +530,24 @@ a {
   box-sizing: border-box;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-cover {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card-cover img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .card:hover {
@@ -1582,6 +1599,9 @@ a {
   .card {
     width: 100%;
     margin: 0;
+  }
+  iframe {
+    height: 315px !important;
   }
   .tag-filter {
     margin-top: 20px;

@@ -49,6 +49,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
   *Multi-sensor fusion SLAM for UAV systems* (2022.12–2024.05)  
   - Studied SLAM methods that fuse camera, LiDAR, IMU and other sensors for robust UAV localization.  
   - Responsible for overall UAV system design, PX4+MAVROS+Gazebo+QGC simulation, physical platform integration, and host-side software (odometry, navigation, decision).  
+  - Familiar with UAV systems and industrial-grade UAV development (e.g., hybrid gasoline-electric UAVs), ArduPilot/PX4 ecosystem, and UAV command-and-control platform development.  
 
 - RoboMaster University Series (RMU), VANGUARD Team (2021.10–present)  
   - Co-founded and served as Vice Captain & vision/navigation lead.  
@@ -123,9 +124,9 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### 教育经历
 
-- 2024–至今：南方科技大学（SUSTech），国家卓越工程师学院，电子信息硕士  
+- 2025.09–至今：南方科技大学（SUSTech），国家卓越工程师学院，电子信息硕士  
   - 研究方向：具身智能 / 视觉语言导航（VLN）  
-- 2019–2023：华南师范大学（SCNU），通信工程本科  
+- 2021.09–2025.06：华南师范大学（SCNU），通信工程本科  
   - RoboMaster 战队 VANGUARD 副队长 / 视觉组长
 
 ### 项目与实践（选摘）
@@ -193,22 +194,22 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1co4y1776i&p=1&autoplay=0"
         scrolling="no" border="0" frameborder="0" framespacing="0" allowfullscreen="true"
-        style="width: 100%; height: 450px; margin-bottom: 1rem;"></iframe>
+        style="width: 100%; height: 450px; margin-bottom: 1rem; max-width: 100%;"></iframe>
 
 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1oN411V7Gz&p=1&autoplay=0"
         scrolling="no" border="0" frameborder="0" framespacing="0" allowfullscreen="true"
-        style="width: 100%; height: 450px; margin-bottom: 1rem;"></iframe>
+        style="width: 100%; height: 450px; margin-bottom: 1rem; max-width: 100%;"></iframe>
 
 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1FC411G781&p=1&autoplay=0"
         scrolling="no" border="0" frameborder="0" framespacing="0" allowfullscreen="true"
-        style="width: 100%; height: 450px; margin-bottom: 1rem;"></iframe>
+        style="width: 100%; height: 450px; margin-bottom: 1rem; max-width: 100%;"></iframe>
 
 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1YJ4m1j7wN&p=1&autoplay=0"
         scrolling="no" border="0" frameborder="0" framespacing="0" allowfullscreen="true"
-        style="width: 100%; height: 450px; margin-bottom: 1rem;"></iframe>
+        style="width: 100%; height: 450px; margin-bottom: 1rem; max-width: 100%;"></iframe>
 
 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1Gu4y137Sa&p=1&autoplay=0"
         scrolling="no" border="0" frameborder="0" framespacing="0" allowfullscreen="true"
-        style="width: 100%; height: 450px; margin-bottom: 1rem;"></iframe>
+        style="width: 100%; height: 450px; margin-bottom: 1rem; max-width: 100%;"></iframe>
 
 本站记录我的技术笔记、想法与实践，写作工具是 Obsidian，发布用 Hugo。
