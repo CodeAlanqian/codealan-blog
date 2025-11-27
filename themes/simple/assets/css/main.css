@@ -718,12 +718,6 @@ a {
   word-break: break-word;
 }
 
-@media (max-width: 720px) {
-  .summary {
-    -webkit-line-clamp: 2;
-  }
-}
-
 .tag-filter {
   display: flex;
   flex-wrap: wrap;
