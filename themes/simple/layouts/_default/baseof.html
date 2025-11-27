@@ -498,6 +498,39 @@
           document.body.appendChild(overlay);
         });
       });
+      // 为缺少说明的图片添加简短占位说明（不修改原始内容）
+      imgs.forEach((img) => {
+        // 已有 alt 或 title 或在 figure 内带 figcaption 的图片跳过
+        if ((img.alt && img.alt.trim()) || (img.title && img.title.trim())) return;
+        const parentFigure = img.closest('figure');
+        if (parentFigure && parentFigure.querySelector('figcaption')) return;
+        let hint = '';
+        try {
+          const src = img.getAttribute('src') || '';
+          if (src) {
+            const parts = src.split('/');
+            const file = parts[parts.length - 1] || '';
+            const base = file.split('.')[0] || '';
+            if (base) {
+              hint = decodeURIComponent(base)
+                .replace(/[-_]+/g, ' ')
+                .trim();
+            }
+          }
+        } catch (e) {}
+        if (!hint) {
+          hint = '自动生成的图片说明';
+        }
+        const caption = document.createElement('div');
+        caption.className = 'auto-img-caption';
+        caption.textContent = hint;
+        const wrapper = parentFigure || img.parentElement;
+        if (wrapper) {
+          wrapper.appendChild(caption);
+        } else {
+          img.insertAdjacentElement('afterend', caption);
+        }
+      });
     })();
     (function() {
       const el = document.querySelector('.view-count');
@@ -658,6 +691,29 @@
         badge.textContent = label;
         block.insertBefore(badge, pre);
         block.dataset.hasLangLabel = 'true';
+      });
+    })();
+    (function() {
+      const blocks = document.querySelectorAll('.code-block');
+      if (!blocks.length) return;
+      const maxCollapsed = 320;
+      blocks.forEach((block) => {
+        if (block.dataset.hasCodeToggle === 'true') return;
+        const pre = block.querySelector('pre');
+        if (!pre) return;
+        const scrollHeight = pre.scrollHeight || 0;
+        if (scrollHeight <= maxCollapsed) return;
+        block.classList.add('collapsed');
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'code-toggle';
+        toggle.textContent = '展开代码';
+        toggle.addEventListener('click', () => {
+          const collapsed = block.classList.toggle('collapsed');
+          toggle.textContent = collapsed ? '展开代码' : '收起代码';
+        });
+        block.parentNode.insertBefore(toggle, block.nextSibling);
+        block.dataset.hasCodeToggle = 'true';
       });
     })();
     (function() {
