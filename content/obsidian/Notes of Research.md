@@ -43,15 +43,4 @@ See, Point, Fly
 
 ### BibTeX 引用示例（悬停预览）
 
-在论文笔记中，可以使用 `bibref` shortcode 为文献添加悬停预览的 BibTeX 引用，例如当前这一条：
-
-{{< bibref title="AerialVLN: Vision-and-Language Navigation for UAVs" url="https://arxiv.org/abs/2403.12345" >}}
-@inproceedings{liu2023aerialvln,
-  title={AerialVLN: Vision-and-Language Navigation for UAVs},
-  author={Liu, A. and Others},
-  booktitle={Proceedings of the 2023 IEEE International Conference on Robotics and Automation (ICRA)},
-  year={2023}
-}
-{{< /bibref >}}
-
-在页面中悬停上述标题即可看到 BibTeX 预览，点击标题会跳转到对应的 PDF 或 arXiv 页面。
+具体交互示例与用法说明，见站内文章《BibTeX 悬停预览示例》。

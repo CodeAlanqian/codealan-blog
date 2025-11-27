@@ -17,7 +17,7 @@ tags:
 ### Basic Information
 
 Yiqian Gong (CodeAlan)  
-M.Eng. student in Electronic Information, National Academy of Engineering (NAE),  
+M.Eng. student in Electronic Information, SUSTech National Graduate College for Engineers (NGCE),  
 Southern University of Science and Technology (SUSTech), China.
 
 My current research interests lie in Embodied AI and Vision-Language Navigation (VLN), with a focus on how agents perceive, understand, and act in complex environments under multi-modal guidance.
@@ -38,7 +38,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 ### Education
 
 - 2025.09–present · M.Eng. in Electronic Information  
-  National Academy of Engineering, SUSTech, China  
+  SUSTech National Graduate College for Engineers (NGCE), Southern University of Science and Technology  
 - 2021.09–2025.06 · B.Eng. in Communication Engineering  
   South China Normal University (SCNU), China  
   · Vice Captain & Vision Group Leader, RoboMaster Team VANGUARD
@@ -104,7 +104,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 ### 基本信息
 
 龚易乾（Yiqian Gong, CodeAlan）  
-南方科技大学（SUSTech）国家卓越工程师学院  
+南方科技大学（SUSTech）国家卓越工程师学院（NGCE）  
 电子信息专业硕士研究生（在读）。
 
 目前主要关注具身智能（Embodied AI）与视觉语言导航（Vision-Language Navigation, VLN），侧重研究智能体在多模态信息引导下，在复杂环境中的感知、理解与决策问题。
@@ -124,7 +124,7 @@ At this stage I am mainly consolidating foundations in Embodied AI, VLN and RL; 
 
 ### 教育经历
 
-- 2025.09–至今：南方科技大学（SUSTech），国家卓越工程师学院，电子信息硕士  
+- 2025.09–至今：南方科技大学（SUSTech），国家卓越工程师学院（NGCE），电子信息硕士  
   - 研究方向：具身智能 / 视觉语言导航（VLN）  
 - 2021.09–2025.06：华南师范大学（SCNU），通信工程本科  
   - RoboMaster 战队 VANGUARD 副队长 / 视觉组长
