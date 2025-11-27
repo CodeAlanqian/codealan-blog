@@ -26,23 +26,24 @@
       {{ end }}
     {{ end }}
     <div class="card-main">
-      <div class="card-head">
-      <h2>{{ .Title }}</h2>
-      <p class="meta">
-        {{ .Date.Format "2006-01-02" }}
-        {{ with .Params.tags }}
-          {{ range . }}
-            <span class="tag" data-tag-key="{{ . | urlize }}">{{ . }}</span>
-          {{ end }}
-        {{ end }}
-      </p>
       {{ with $cover }}
         <div class="card-cover">
           <img src="{{ . | relURL }}" alt="{{ $.Title }}">
         </div>
       {{ end }}
-      {{ $summary := .Summary | plainify | truncate 260 }}
-      {{ if not $summary }}{{ $summary = .Plain | plainify | truncate 180 }}{{ end }}
+      <div class="card-head">
+        <h2>{{ .Title }}</h2>
+        <p class="meta">
+          {{ .Date.Format "2006-01-02" }}
+          {{ with .Params.tags }}
+            {{ range . }}
+              <span class="tag" data-tag-key="{{ . | urlize }}">{{ . }}</span>
+            {{ end }}
+          {{ end }}
+        </p>
+      </div>
+      {{ $summary := .Summary | plainify | truncate 340 }}
+      {{ if not $summary }}{{ $summary = .Plain | plainify | truncate 220 }}{{ end }}
       <p class="summary">{{ $summary }}</p>
     </div>
   </a>
