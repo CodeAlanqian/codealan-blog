@@ -341,10 +341,12 @@ a {
     font-size: 18px;
   }
   .tagline {
-    display: none;
-  }
-  .bio-keywords-mobile {
     display: block;
+    max-width: 100%;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .site-nav a {
     margin-left: 0;
@@ -504,11 +506,9 @@ a {
   color: var(--muted);
 }
 
+/* 预留：如需在移动端单独展示关键词，可使用 .bio-keywords-mobile；当前未启用 */
 .bio-keywords-mobile {
   display: none;
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 13px;
 }
 
 .bio a,
