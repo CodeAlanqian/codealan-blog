@@ -1075,6 +1075,18 @@ a {
   max-width: 100%;
 }
 
+.katex-display {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .katex,
+  .katex-display {
+    font-size: 0.96em;
+  }
+}
+
 .toc {
   margin: 4px 0 18px;
   padding: 12px 14px;
@@ -1102,6 +1114,106 @@ a {
 
 .toc a {
   color: var(--muted);
+}
+
+.ai-mindmap-block {
+  margin: 12px 0 18px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  background: var(--card);
+}
+
+.ai-mindmap-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-mindmap-subtitle {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ai-mindmap-svg {
+  width: 100%;
+  max-height: 260px;
+  display: block;
+}
+
+.ai-mindmap-node {
+  cursor: pointer;
+}
+
+.ai-mindmap-circle {
+  fill: rgba(14, 165, 233, 0.08);
+  stroke: var(--accent);
+  stroke-width: 1.2;
+}
+
+.ai-mindmap-label {
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.ai-mindmap-edge {
+  stroke: rgba(148, 163, 184, 0.7);
+  stroke-width: 1;
+}
+
+.bibref {
+  position: relative;
+  display: inline-block;
+}
+
+.bibref-link {
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.7);
+}
+
+.bibref-popover {
+  position: absolute;
+  left: 0;
+  top: 120%;
+  min-width: 260px;
+  max-width: 420px;
+  width: 90vw;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35);
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 40;
+}
+
+.bibref:hover .bibref-popover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.bibref-popover-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bibref-code {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--code-bg);
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-size: 11px;
+  overflow-x: auto;
 }
 
 .toc a:hover {

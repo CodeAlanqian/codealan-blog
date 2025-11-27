@@ -33,9 +33,25 @@ https://mp.weixin.qq.com/s/cTOPdjYscWUZyag5I_un0g
 [机器人顶会IROS，ICRA论文模板下载及投稿须知，以及机器人各大会议查询_icra模板-CSDN博客](https://blog.csdn.net/Time_Memory_cici/article/details/135858380)
 
 
-ReferDINO
+ReferDINO  
 [ReferDINO: Referring Video Object Segmentation with Visual Grounding Foundations](https://isee-laboratory.github.io/ReferDINO/)
 
 
-See, Point, Fly
+See, Point, Fly  
 [Hu-chih-yao/see-point-fly: [CoRL 2025] See, Point, Fly: A Learning-Free VLM Framework for Universal Unmanned Aerial Navigation](https://github.com/Hu-chih-yao/see-point-fly)
+
+
+### BibTeX 引用示例（悬停预览）
+
+在论文笔记中，可以使用 `bibref` shortcode 为文献添加悬停预览的 BibTeX 引用，例如：
+
+{{</* bibref title="AerialVLN: Vision-and-Language Navigation for UAVs" url="https://arxiv.org/abs/2403.12345" */>}}
+@inproceedings{liu2023aerialvln,
+  title={AerialVLN: Vision-and-Language Navigation for UAVs},
+  author={Liu, A. and Others},
+  booktitle={Proceedings of the 2023 IEEE International Conference on Robotics and Automation (ICRA)},
+  year={2023}
+}
+{{</* /bibref */>}}
+
+将上面代码片段放入任意 Markdown 文章中，在页面中悬停标题即可看到 BibTeX 预览，点击标题会跳转到对应的 PDF 或 arXiv 页面。

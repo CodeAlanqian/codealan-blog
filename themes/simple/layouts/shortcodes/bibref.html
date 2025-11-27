@@ -1,0 +1,10 @@
+{{- $title := .Get "title" -}}
+{{- $url := .Get "url" | default "#" -}}
+<span class="bibref">
+  <a href="{{ $url }}" target="_blank" rel="noreferrer noopener" class="bibref-link">{{ $title }}</a>
+  <span class="bibref-popover">
+    <span class="bibref-popover-title">BibTeX</span>
+    <pre class="bibref-code"><code>{{ .Inner | safeHTML }}</code></pre>
+  </span>
+</span>
+

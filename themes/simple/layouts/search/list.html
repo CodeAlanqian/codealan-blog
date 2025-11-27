@@ -107,6 +107,30 @@
       const normalizeTag = (s) => normalize(s).replace(/\s+/g, '_');
       const tokenize = (q) => normalize(q).split(/[\s\u3000]+/).filter(Boolean);
 
+      const SYNONYMS = {
+        'vln': ['vision language navigation', 'vision-language navigation', '视觉语言导航'],
+        'ros': ['robot operating system'],
+        'uav': ['drone', '无人机'],
+        'drone': ['uav', '无人机'],
+        'llm': ['large language model', '大语言模型'],
+        'rl': ['reinforcement learning', '强化学习'],
+        'embodied': ['embodied ai', '具身智能'],
+        'habitat': ['ai habitat']
+      };
+
+      const expandTokens = (tokens) => {
+        const all = new Set(tokens);
+        tokens.forEach((t) => {
+          const syns = SYNONYMS[t];
+          if (syns && syns.length) {
+            syns.forEach((s) => {
+              all.add(normalize(s));
+            });
+          }
+        });
+        return Array.from(all);
+      };
+
       const fuzzyRank = (text, tok) => {
         if (!text || !tok) return 0;
         if (text.includes(tok)) return 2;
@@ -163,7 +187,8 @@
 
       const runSearch = () => {
         const q = input.value;
-        const tokens = tokenize(q);
+        const baseTokens = tokenize(q);
+        const tokens = expandTokens(baseTokens);
         let pool = pages.filter(matchFilters);
         if (!tokens.length) {
           pool = pool

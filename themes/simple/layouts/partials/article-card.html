@@ -7,7 +7,26 @@
 <article class="card"{{ if gt (len $dataTags) 0 }} data-tags="{{ delimit $dataTags "," }}"{{ end }}>
   <a class="card-link" href="{{ .RelPermalink }}">
     <div class="card-head">
-      {{ with .Params.cover }}
+      {{ $cover := .Params.cover }}
+      {{ if not $cover }}
+        {{ with .Resources.ByType "image" }}
+          {{ with .GetMatch "*" }}
+            {{ $cover = .RelPermalink }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ if not $cover }}
+        {{ $imgs := findRE "<img[^>]+src=\\\"([^\\\"]+)\\\"" .Content 1 }}
+        {{ if gt (len $imgs) 0 }}
+          {{ $m := index $imgs 0 }}
+          {{ $srcMatch := findRE "src=\\\"([^\\\"]+)\\\"" $m 1 }}
+          {{ if gt (len $srcMatch) 0 }}
+            {{ $raw := index $srcMatch 0 }}
+            {{ $cover = (replace (replace $raw "src=\"" "") "\"" "") }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ with $cover }}
         <div class="card-cover">
           <img src="{{ . | relURL }}" alt="{{ $.Title }}">
         </div>

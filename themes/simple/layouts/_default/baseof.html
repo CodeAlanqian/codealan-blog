@@ -200,6 +200,108 @@
       });
     })();
     (function() {
+      const container = document.getElementById('aiMindmap');
+      const article = document.querySelector('.post .content');
+      if (!container || !article) return;
+      const headings = Array.from(article.querySelectorAll('h2[id], h3[id]'));
+      if (!headings.length) return;
+      const nodes = [];
+      const edges = [];
+      const rootId = '__root__';
+      nodes.push({ id: rootId, label: '本文结构', level: 0 });
+      let lastH2 = null;
+      headings.forEach((h) => {
+        const level = h.tagName === 'H2' ? 1 : 2;
+        const id = h.id || '';
+        const label = (h.textContent || '').trim();
+        if (!label) return;
+        nodes.push({ id, label, level, targetId: id });
+        if (level === 1) {
+          edges.push({ source: rootId, target: id });
+          lastH2 = id;
+        } else if (lastH2) {
+          edges.push({ source: lastH2, target: id });
+        } else {
+          edges.push({ source: rootId, target: id });
+        }
+      });
+      if (nodes.length <= 1) return;
+      const width = container.clientWidth || 420;
+      const height = 220;
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.setAttribute('class', 'ai-mindmap-svg');
+
+      const levelGroups = { 0: [], 1: [], 2: [] };
+      nodes.forEach((n) => {
+        const l = n.level || 0;
+        if (!levelGroups[l]) levelGroups[l] = [];
+        levelGroups[l].push(n);
+      });
+      const colX = {
+        0: width * 0.12,
+        1: width * 0.45,
+        2: width * 0.78
+      };
+      const placeLevel = (level) => {
+        const list = levelGroups[level] || [];
+        const count = list.length || 1;
+        const gap = height / (count + 1);
+        list.forEach((n, i) => {
+          n.x = colX[level];
+          n.y = gap * (i + 1);
+        });
+      };
+      placeLevel(0);
+      placeLevel(1);
+      placeLevel(2);
+
+      const idMap = new Map(nodes.map(n => [n.id, n]));
+
+      edges.forEach((e) => {
+        const s = idMap.get(e.source);
+        const t = idMap.get(e.target);
+        if (!s || !t) return;
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('class', 'ai-mindmap-edge');
+        line.setAttribute('x1', s.x);
+        line.setAttribute('y1', s.y);
+        line.setAttribute('x2', t.x);
+        line.setAttribute('y2', t.y);
+        svg.appendChild(line);
+      });
+
+      nodes.forEach((n) => {
+        const g = document.createElementNS(svgNS, 'g');
+        g.setAttribute('class', 'ai-mindmap-node');
+        const circle = document.createElementNS(svgNS, 'circle');
+        circle.setAttribute('class', 'ai-mindmap-circle');
+        circle.setAttribute('cx', n.x);
+        circle.setAttribute('cy', n.y);
+        circle.setAttribute('r', n.level === 0 ? 11 : 8);
+        const label = document.createElementNS(svgNS, 'text');
+        label.setAttribute('class', 'ai-mindmap-label');
+        label.setAttribute('x', n.x + (n.level === 0 ? 0 : 10));
+        label.setAttribute('y', n.y + 3);
+        label.setAttribute('text-anchor', n.level === 0 ? 'middle' : 'start');
+        label.textContent = n.label;
+        g.appendChild(circle);
+        g.appendChild(label);
+        if (n.targetId) {
+          g.addEventListener('click', () => {
+            const target = document.getElementById(n.targetId);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+        svg.appendChild(g);
+      });
+
+      container.appendChild(svg);
+    })();
+    (function() {
       const btn = document.getElementById('postShareBtn');
       if (!btn || typeof window === 'undefined') return;
       btn.addEventListener('click', () => {
@@ -766,15 +868,21 @@
       }
     })();
     {{ if .Params.math }}
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false},
-        {left: "\\(", right: "\\)", display: false},
-        {left: "\\[", right: "\\]", display: true}
-      ],
-      throwOnError: false
-    });
+    if (typeof renderMathInElement === 'function') {
+      const renderTarget = document.querySelector('.post .content') || document.body;
+      renderMathInElement(renderTarget, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false},
+          {left: "\\[", right: "\\]", display: true}
+        ],
+        throwOnError: false,
+        maxExpand: 1000,
+        strict: 'ignore',
+        ignoredTags: ['script', 'noscript', 'style', 'textarea']
+      });
+    }
     {{ end }}
   </script>
 </body>

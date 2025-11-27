@@ -31,6 +31,11 @@
           {{ . }}
         </nav>
       {{ end }}
+      <section class="ai-mindmap-block">
+        <p class="ai-mindmap-title">AI 生成思维导图（实验功能）</p>
+        <p class="ai-mindmap-subtitle">基于本文结构自动提取，不保证完全准确，仅供快速浏览。</p>
+        <div id="aiMindmap"></div>
+      </section>
       <div class="content">
         {{ $html := .Content | replaceRE "(<pre[\\s\\S]*?</pre>)" (partial "code-block.html" "${1}") }}
         {{ $html = $html | replaceRE "<img([^>]*?)>" "<img loading=\"lazy\"$1>" }}
