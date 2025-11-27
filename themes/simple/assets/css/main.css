@@ -2471,12 +2471,12 @@ a {
   width: 4px;
 }
 .content .code-block pre::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.85);
-  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 999px;
 }
 
 .dark .content .code-block pre::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.8);
+  background: rgba(148, 163, 184, 0.6);
 }
 
 .pagination {
