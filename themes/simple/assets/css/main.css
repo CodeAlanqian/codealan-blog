@@ -341,6 +341,9 @@ a {
     font-size: 18px;
   }
   .tagline {
+    display: none;
+  }
+  .home .tagline {
     display: block;
     max-width: 100%;
     font-size: 12px;
