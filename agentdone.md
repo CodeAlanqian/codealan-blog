@@ -127,7 +127,7 @@
 ## 后续小改动与脚本补充
 
 - 站点信息与视觉细节  
-  - 副标题更新为：`记录具身智能、VLN 学习与开发折腾的日常。`（`config.yaml: params.description`）。  
+  - 副标题更新为：`记录 UAV / 具身智能 / VLN 的学习与实践。`（`config.yaml: params.description`）。  
   - 作者统一为 `CodeAlan`（`config.yaml: params.author`），用于 footer 与元信息。  
   - 在文章顶部日期后显示“更新于 YYYY-MM-DD”，基于 Hugo 的 `.Lastmod` 字段，仅当 `lastmod` 与 `date` 不同时显示。  
   - 顶部导航栏透明度调优至约 30%，在亮色/暗色模式下使用不同的半透明背景，同时保持模糊效果。  
