@@ -33,6 +33,7 @@
 - SEO：  
   - Meta description 优先取页面描述/摘要，列表页使用分区标题拼接站点描述，避免重复与过短。  
   - IndexNow：在 `static/` 根目录放置 key 文件，构建后对外可访问 `/7f54f8a7d94e4384a39ac2db05dfd452.txt`。  
+  - IndexNow 提交：运行 `scripts/indexnow_submit.py` 从 `public/sitemap.xml` 批量提交 URL（支持 `--dry-run`）。  
 
 ## 博客后台：AI 代理 + 浏览量统计
 

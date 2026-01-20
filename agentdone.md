@@ -133,6 +133,7 @@
   - 顶部导航栏透明度调优至约 30%，在亮色/暗色模式下使用不同的半透明背景，同时保持模糊效果。  
   - SEO：meta description 优先取页面描述/摘要，列表页拼接分区标题与站点简介，短描述自动补全避免重复。  
   - IndexNow：新增 `static/7f54f8a7d94e4384a39ac2db05dfd452.txt`，用于 Bing 验证与快速收录。  
+  - IndexNow 提交：新增 `scripts/indexnow_submit.py`，从 `public/sitemap.xml` 读取 URL 并 POST 到 `https://api.indexnow.org/IndexNow`。  
 
 - 标签与颜色规则  
   - 为标签元素增加 `data-tag-key` 属性（单篇与列表卡片中），用于 CSS 精细控制：  
