@@ -1,4 +1,4 @@
-baseURL: "http://localhost:1313/"
+baseURL: "https://codealan.top/"
 languageCode: "zh-cn"
 title: "CodeAlan's Blog"
 theme: simple
@@ -13,7 +13,7 @@ ignoreFiles:
   - "\\.git/"
 
 params:
-  description: "记录 UAV / 具身智能 / VLN 的学习与实践。"
+  description: "记录 UAV / 具身智能 / VLN 的学习与实践，包含研究笔记、课程总结、项目复盘与工具经验。"
   author: "CodeAlan"
 
 permalinks:

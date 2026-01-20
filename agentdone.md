@@ -131,6 +131,7 @@
   - 作者统一为 `CodeAlan`（`config.yaml: params.author`），用于 footer 与元信息。  
   - 在文章顶部日期后显示“更新于 YYYY-MM-DD”，基于 Hugo 的 `.Lastmod` 字段，仅当 `lastmod` 与 `date` 不同时显示。  
   - 顶部导航栏透明度调优至约 30%，在亮色/暗色模式下使用不同的半透明背景，同时保持模糊效果。  
+  - SEO：meta description 优先取页面描述/摘要，列表页拼接分区标题与站点简介，短描述自动补全避免重复。  
 
 - 标签与颜色规则  
   - 为标签元素增加 `data-tag-key` 属性（单篇与列表卡片中），用于 CSS 精细控制：  

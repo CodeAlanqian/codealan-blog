@@ -30,6 +30,8 @@
 - 标签与颜色：  
   - 标签统一使用 `data-tag-key`，根据领域自动上色（如 `vln` / `ros` / `docker` / `rl` / `llm` / `ubuntu` / `latex` / `habitat` 等）。  
   - 搜索结果页和文章卡片中的标签颜色保持一致。  
+- SEO：  
+  - Meta description 优先取页面描述/摘要，列表页使用分区标题拼接站点描述，避免重复与过短。  
 
 ## 博客后台：AI 代理 + 浏览量统计
 
