@@ -12,6 +12,7 @@
   - 需求：保持 443 同时服务博客与 VLESS-Reality（sui），而不再占用额外端口。  
   - 调整：  
     - 博客 HTTPS 后端改为内部 8444（同一证书），由 Nginx `http` 块监听 8444 提供内容。  
+    - 新增文件站点 `file.codealan.top`：由 Nginx `http` 块监听 8445，TLS 终止后反代到本地 `127.0.0.1:8888`。  
     - 新增 `/etc/nginx/stream.conf`，启用 `stream` 层 SNI 分流 443。  
     - 更新 `/etc/nginx/nginx.conf`，在文件末尾 `include /etc/nginx/stream.conf;`。  
   - stream 分流规则（443 TCP）：  
@@ -21,10 +22,12 @@
             aws.amazon.com     sui;
             codealan.top       web;
             www.codealan.top   web;
+            file.codealan.top  file;
             default            web;
         }
 
         upstream web { server 127.0.0.1:8444; }
+        upstream file { server 127.0.0.1:8445; }
         upstream sui { server 127.0.0.1:8443; }
 
         server {
@@ -55,13 +58,35 @@
         location / { try_files $uri $uri/ =404; }
     }
     ```
+  - 文件站点 8445 配置（同证书，可放入同一站点文件中）：  
+    ```nginx
+    server {
+        listen 8445 ssl http2;
+        listen [::]:8445 ssl http2;
+        server_name file.codealan.top;
+        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.pem;
+        ssl_certificate_key /etc/nginx/ssl/codealan.top/privkey.pem;
+
+        location / {
+            proxy_pass http://127.0.0.1:8888;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+    ```
   - 分流逻辑：  
     - 客户端 SNI 为 `aws.amazon.com` → 转发到 `127.0.0.1:8443`（sui）。  
     - SNI 为 `codealan.top` / `www.codealan.top` 或空/其他 → 转发到博客 8444。  
+    - SNI 为 `file.codealan.top` → 转发到文件站点 8445（再反代到 `127.0.0.1:8888`）。  
   - 重启验证：`nginx -t` 通过，`curl -k https://127.0.0.1` 返回 200（博客），80 返回 301 到 HTTPS。  
+  - 证书补充：若新增 `file.codealan.top`，需要重新签发或扩展证书包含该域名（acme.sh `--issue -d codealan.top -d www.codealan.top -d file.codealan.top`）。  
 
 使用说明（客户端侧）  
 - 博客：`https://codealan.top/` 正常访问。  
+- 文件站点：`https://file.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:8888`。  
 - VLESS-Reality：保持 SNI=`aws.amazon.com`，连接 `43.156.100.159:443`，将流量经 stream 分流到本地 `127.0.0.1:8443` 的 sui。  
 
 主要命令（摘要）
