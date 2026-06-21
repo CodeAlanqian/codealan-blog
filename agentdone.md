@@ -105,6 +105,10 @@
     - 初版只信任 `127.0.0.1/32,::1/128`，但 Nginx 访问容器时源地址表现为 Docker 网桥 `172.19.0.1`，导致 Copyparty 忽略 `X-Forwarded-Proto: https`。
     - 登录 POST 因此被误判为 `https://file.codealan.top` Origin 对 `http://file.codealan.top` 请求，触发 `rejected by cors-check`。
     - 已改为 `--xff-src lan` 并增加 `--xf-proto-fb https`，让 Copyparty 正确识别反代后的外部协议。
+  - 上传分片：
+    - 线上 Nginx 系统配置暂未写入 `client_max_body_size 0;`，默认请求体限制会导致 Copyparty 默认上传分片触发 `413 Request Entity Too Large`。
+    - Copyparty 的 `--u2sz` 只接受整数 MiB，无法稳定降到 Nginx 默认 1MiB 以下；因此这个问题必须在 Nginx 层修复。
+    - 长期方案是在 `file.codealan.top` 的 Nginx server/location 中设置 `client_max_body_size 0;` 和 `proxy_request_buffering off;`。
   - 切换过程：
     - 旧容器 `file-transfer-go` 占用 `0.0.0.0:8888->8080`，且无宿主机挂载；已停止但未删除，便于回滚。
     - 拉取镜像 `ghcr.io/9001/copyparty-ac:latest`，当前容器 `copyparty-file` 已启动。
