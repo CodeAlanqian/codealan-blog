@@ -77,7 +77,7 @@
   - `file.codealan.top` 使用 Docker 部署 Copyparty，Compose 文件为 `docker-compose.copyparty.yml`。  
   - 启动脚本：`./start_copyparty.sh`，读取本地忽略文件 `copyparty/.env` 中的 `COPYPARTY_ADMIN_PASSWORD`。  
   - 文件持久化目录：`copyparty/files/`；Copyparty 状态目录：`copyparty/state/`，二者均不进入 Git。  
-  - 权限模型：匿名用户只读，`admin` 登录后可上传、移动、删除文件。  
+  - 权限模型：仅 `admin` 可浏览、下载、上传、移动、删除文件；匿名用户无访问权限。  
   - 容器只绑定 `127.0.0.1:8888`，公网访问通过 Nginx `file.codealan.top` 反代进入。  
   - 反代模式下信任私网来源 `--xff-src lan`，用于正确识别 Nginx 传入的 `X-Forwarded-Proto: https`，避免登录时被 CORS/CSRF 检查拒绝。  
   - 上传性能：启用 `--turbo 2`，并将 Web 客户端并发上传设置为 `--u2j 6`、分片设置为 `--u2sz 8,16,64`。  

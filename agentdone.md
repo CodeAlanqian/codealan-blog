@@ -99,7 +99,7 @@
     - 文件目录：`copyparty/files/` → 容器 `/w`。
     - 状态目录：`copyparty/state/` → 容器 `/cfg/copyparty`。
   - 权限：
-    - `-v /w::r:rwmd,admin`：匿名用户只读；`admin` 用户可上传、移动、删除。
+    - `-v /w::rwmda,admin`：仅 `admin` 用户可浏览、下载、上传、移动、删除；匿名用户无访问权限。
     - `--usernames`：登录时要求用户名 + 密码。
   - 反代头处理：
     - 初版只信任 `127.0.0.1/32,::1/128`，但 Nginx 访问容器时源地址表现为 Docker 网桥 `172.19.0.1`，导致 Copyparty 忽略 `X-Forwarded-Proto: https`。

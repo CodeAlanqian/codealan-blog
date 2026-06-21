@@ -34,4 +34,4 @@ services:
       - -a
       - admin:${COPYPARTY_ADMIN_PASSWORD:?set COPYPARTY_ADMIN_PASSWORD in copyparty/.env}
       - -v
-      - /w::r:rwmd,admin
+      - /w::rwmda,admin
