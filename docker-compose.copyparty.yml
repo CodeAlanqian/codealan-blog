@@ -27,7 +27,7 @@ services:
       - --turbo
       - "2"
       - --u2j
-      - "4"
+      - "6"
       - --u2sz
       - 8,16,64
       - --usernames

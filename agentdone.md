@@ -111,7 +111,7 @@
     - 长期方案是在 `file.codealan.top` 的 Nginx server/location 中设置 `client_max_body_size 0;` 和 `proxy_request_buffering off;`。
   - 上传性能：
     - 开启 `--turbo 2`，让 Web 客户端默认启用 turbo 上传模式。
-    - 设置 `--u2j 4`，将浏览器并发上传任务从默认 2 提高到 4。
+    - 设置 `--u2j 6`，将浏览器并发上传任务从默认 2 提高到 6。
     - 设置 `--u2sz 8,16,64`，让上传 POST 分片默认 16MiB，最大 64MiB，减少小分片往返开销。
   - 切换过程：
     - 旧容器 `file-transfer-go` 占用 `0.0.0.0:8888->8080`，且无宿主机挂载；已停止但未删除，便于回滚。
