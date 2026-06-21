@@ -24,6 +24,14 @@ docker stop NAME && docker rm NAME # 停止并删除容器
 docker logs -f NAME                # 持续查看日志
 ```
 
+- Copyparty 文件站  
+```bash
+./start_copyparty.sh
+docker ps --filter name=copyparty-file
+docker logs -f copyparty-file
+docker compose --env-file copyparty/.env -f docker-compose.copyparty.yml down
+```
+
 - 清理无用资源（谨慎使用）  
 ```bash
 docker system prune -f             # 删除无用容器/网络/构建缓存
@@ -112,6 +120,13 @@ journalctl -u nginx -e        # 查看 Nginx 日志
   - 注意 `nginx.conf` 需要包含 `stream` 配置，例如：  
 ```nginx
 include /etc/nginx/stream.conf;
+```  
+- `file.codealan.top` 反代 Copyparty 上传大文件时，在对应 `server` 或 `location /` 中加入：  
+```nginx
+client_max_body_size 0;
+proxy_request_buffering off;
+proxy_read_timeout 3600s;
+proxy_send_timeout 3600s;
 ```  
 
 ### Docker / GPU 环境

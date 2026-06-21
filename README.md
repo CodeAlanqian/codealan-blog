@@ -71,7 +71,14 @@
 - 443 端口复用：  
   - 通过 `stream` 模块按 SNI 分流：  
     - `codealan.top` / `www.codealan.top` → 8444 (blog)。  
+    - `file.codealan.top` → 8445 (Copyparty 文件站)。  
     - `aws.amazon.com` → 8443 (VLESS-Reality / sui)。  
+- 文件站点：  
+  - `file.codealan.top` 使用 Docker 部署 Copyparty，Compose 文件为 `docker-compose.copyparty.yml`。  
+  - 启动脚本：`./start_copyparty.sh`，读取本地忽略文件 `copyparty/.env` 中的 `COPYPARTY_ADMIN_PASSWORD`。  
+  - 文件持久化目录：`copyparty/files/`；Copyparty 状态目录：`copyparty/state/`，二者均不进入 Git。  
+  - 权限模型：匿名用户只读，`admin` 登录后可上传、移动、删除文件。  
+  - 容器只绑定 `127.0.0.1:8888`，公网访问通过 Nginx `file.codealan.top` 反代进入。  
 
 ## 本地开发与构建
 
@@ -93,6 +100,7 @@
 - 忽略规则：  
   - 忽略 Hugo 构建产物与锁文件：`public/`、`.hugo_build.lock`。  
   - 忽略大文件与 PDF：`static/files/`、`static/**/*.pdf`、`content/**/*.pdf`、`public/**/*.pdf`。  
+  - 忽略 Copyparty 的本地密钥、文件和运行状态：`copyparty/.env`、`copyparty/files/`、`copyparty/state/`。  
 - 历史清理：  
   - 早期提交曾包含 VLN 讲义、项目 PDF 以及 `public/` 下的大文件，收到 GitHub 大文件警告后，已重建 git 历史，仅保留“干净”的初始提交，并强制推送覆盖远程历史。  
   - 现在仓库只跟踪源码和内容，不再保存构建结果或大体积资产。  

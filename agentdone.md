@@ -89,9 +89,44 @@
 - 文件站点：`https://file.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:8888`。  
 - VLESS-Reality：保持 SNI=`aws.amazon.com`，连接 `43.156.100.159:443`，将流量经 stream 分流到本地 `127.0.0.1:8443` 的 sui。  
 
+- 文件站点改为 Copyparty（2026-06-21）
+  - 目标：将 `file.codealan.top` 后端从旧的 `file-transfer-go` 切换为 Docker 部署的 Copyparty，支持网页文件浏览、上传和在线播放/下载。
+  - 新增文件：
+    - `docker-compose.copyparty.yml`：使用 `ghcr.io/9001/copyparty-ac:latest`，容器名 `copyparty-file`，仅绑定 `127.0.0.1:8888:3923`。
+    - `start_copyparty.sh`：读取 `copyparty/.env` 并执行 `docker compose --env-file ... up -d`。
+    - `copyparty/.env.example`：仅提供变量模板；真实 `copyparty/.env` 被 `.gitignore` 忽略。
+  - 持久化：
+    - 文件目录：`copyparty/files/` → 容器 `/w`。
+    - 状态目录：`copyparty/state/` → 容器 `/cfg/copyparty`。
+  - 权限：
+    - `-v /w::r:rwmd,admin`：匿名用户只读；`admin` 用户可上传、移动、删除。
+    - `--usernames`：登录时要求用户名 + 密码。
+  - 切换过程：
+    - 旧容器 `file-transfer-go` 占用 `0.0.0.0:8888->8080`，且无宿主机挂载；已停止但未删除，便于回滚。
+    - 拉取镜像 `ghcr.io/9001/copyparty-ac:latest`，当前容器 `copyparty-file` 已启动。
+  - 验证：
+    - `docker ps` 显示 `copyparty-file` 运行中，端口为 `127.0.0.1:8888->3923/tcp`。
+    - `curl -I http://127.0.0.1:8888/` 返回 `HTTP/1.1 200 OK`。
+    - `curl -k -I https://file.codealan.top/` 返回 `HTTP/2 200`。
+    - 浏览器 UA 访问 `https://file.codealan.top/` 返回 Copyparty HTML，页面标题为 `CodeAlan Files`。
+  - Nginx 备注：
+    - 当前站点文件已存在 `file.codealan.top` 的 8445 HTTPS 反代到 `127.0.0.1:8888`。
+    - 为支持视频等大文件上传，建议在 `file.codealan.top` 的 `server` 或 `location /` 中加入：
+      ```nginx
+      client_max_body_size 0;
+      proxy_request_buffering off;
+      proxy_read_timeout 3600s;
+      proxy_send_timeout 3600s;
+      ```
+    - 按仓库约定，本次未直接写入 `/etc/nginx/...` 系统文件。
+  - 回滚：
+    - 停止 Copyparty：`docker compose --env-file copyparty/.env -f docker-compose.copyparty.yml down`。
+    - 恢复旧容器：`docker start file-transfer-go`。
+
 主要命令（摘要）
 - 安装 Hugo：`wget -O /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.124.1/hugo_extended_0.124.1_Linux-amd64.tar.gz`，`tar -xzf /tmp/hugo.tar.gz -C /tmp/hugo && install -m 755 /tmp/hugo/hugo ~/.local/bin/hugo`
 - 同步/构建/预览脚本：`chmod +x sync-from-onedrive.sh build.sh preview.sh`，`./sync-from-onedrive.sh`，`./build.sh`，`./preview.sh`
+- Copyparty 文件站：`cp copyparty/.env.example copyparty/.env`，设置 `COPYPARTY_ADMIN_PASSWORD`，然后运行 `./start_copyparty.sh`
 - Nginx 站点/日志：`sudo tee /etc/nginx/sites-available/codealan.top ...`，`sudo ln -sf /etc/nginx/sites-available/codealan.top /etc/nginx/sites-enabled/`
 - 证书申请：`/home/ubuntu/.acme.sh/acme.sh --register-account -m codealan@qq.com --server letsencrypt`，`/home/ubuntu/.acme.sh/acme.sh --issue -d codealan.top -d www.codealan.top -w /var/www/letsencrypt`，证书复制：`sudo cp ~/.acme.sh/codealan.top_ecc/{codealan.top.key,fullchain.cer} /etc/nginx/ssl/codealan.top/`
 - Nginx 检查/重载：`sudo nginx -t`，`sudo systemctl reload nginx`（或 restart）

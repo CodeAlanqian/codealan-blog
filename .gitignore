@@ -17,3 +17,8 @@ public/**/*.pdf
 ai_log.log
 backend.log
 views.db
+
+# Copyparty local runtime data
+copyparty/.env
+copyparty/files/
+copyparty/state/
