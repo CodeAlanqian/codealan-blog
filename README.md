@@ -79,6 +79,7 @@
   - 文件持久化目录：`copyparty/files/`；Copyparty 状态目录：`copyparty/state/`，二者均不进入 Git。  
   - 权限模型：匿名用户只读，`admin` 登录后可上传、移动、删除文件。  
   - 容器只绑定 `127.0.0.1:8888`，公网访问通过 Nginx `file.codealan.top` 反代进入。  
+  - 反代模式下信任私网来源 `--xff-src lan`，用于正确识别 Nginx 传入的 `X-Forwarded-Proto: https`，避免登录时被 CORS/CSRF 检查拒绝。  
 
 ## 本地开发与构建
 

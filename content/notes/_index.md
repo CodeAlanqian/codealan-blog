@@ -128,6 +128,7 @@ proxy_request_buffering off;
 proxy_read_timeout 3600s;
 proxy_send_timeout 3600s;
 ```  
+- Copyparty 登录失败并提示 `rejected by cors-check` 时，先看容器日志；若出现 `x-forwarded-for from untrusted source 172.x.x.x`，需要在 Copyparty 启动参数里信任 Docker 网桥/私网来源，例如 `--xff-src lan`，否则它会忽略 `X-Forwarded-Proto` 并把 HTTPS 登录误判成 HTTP 请求。  
 
 ### Docker / GPU 环境
 

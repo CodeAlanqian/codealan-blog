@@ -101,6 +101,10 @@
   - 权限：
     - `-v /w::r:rwmd,admin`：匿名用户只读；`admin` 用户可上传、移动、删除。
     - `--usernames`：登录时要求用户名 + 密码。
+  - 反代头处理：
+    - 初版只信任 `127.0.0.1/32,::1/128`，但 Nginx 访问容器时源地址表现为 Docker 网桥 `172.19.0.1`，导致 Copyparty 忽略 `X-Forwarded-Proto: https`。
+    - 登录 POST 因此被误判为 `https://file.codealan.top` Origin 对 `http://file.codealan.top` 请求，触发 `rejected by cors-check`。
+    - 已改为 `--xff-src lan` 并增加 `--xf-proto-fb https`，让 Copyparty 正确识别反代后的外部协议。
   - 切换过程：
     - 旧容器 `file-transfer-go` 占用 `0.0.0.0:8888->8080`，且无宿主机挂载；已停止但未删除，便于回滚。
     - 拉取镜像 `ghcr.io/9001/copyparty-ac:latest`，当前容器 `copyparty-file` 已启动。
