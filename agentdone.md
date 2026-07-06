@@ -23,11 +23,13 @@
             codealan.top       web;
             www.codealan.top   web;
             file.codealan.top  file;
+            nas.codealan.top   nas;
             default            web;
         }
 
         upstream web { server 127.0.0.1:8444; }
         upstream file { server 127.0.0.1:8445; }
+        upstream nas { server 127.0.0.1:8446; }
         upstream sui { server 127.0.0.1:8443; }
 
         server {
@@ -81,13 +83,84 @@
     - 客户端 SNI 为 `aws.amazon.com` → 转发到 `127.0.0.1:8443`（sui）。  
     - SNI 为 `codealan.top` / `www.codealan.top` 或空/其他 → 转发到博客 8444。  
     - SNI 为 `file.codealan.top` → 转发到文件站点 8445（再反代到 `127.0.0.1:8888`）。  
+    - SNI 为 `nas.codealan.top` → 转发到 NAS 站点 8446（再反代到 `127.0.0.1:5666`）。
   - 重启验证：`nginx -t` 通过，`curl -k https://127.0.0.1` 返回 200（博客），80 返回 301 到 HTTPS。  
   - 证书补充：若新增 `file.codealan.top`，需要重新签发或扩展证书包含该域名（acme.sh `--issue -d codealan.top -d www.codealan.top -d file.codealan.top`）。  
 
 使用说明（客户端侧）  
 - 博客：`https://codealan.top/` 正常访问。  
 - 文件站点：`https://file.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:8888`。  
+- NAS 站点：`https://nas.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:5666`。
 - VLESS-Reality：保持 SNI=`aws.amazon.com`，连接 `43.156.100.159:443`，将流量经 stream 分流到本地 `127.0.0.1:8443` 的 sui。  
+
+- NAS 站点 Nginx 配置建议（2026-07-06）
+  - 目标：将 `nas.codealan.top` 接入现有 443 SNI 分流，后端服务端口为本机 `5666`。
+  - 约定：按仓库规则，不直接写入 `/etc/nginx/...` 系统文件；以下为需要加入服务器 Nginx 配置的片段。
+  - `/etc/nginx/sites-available/codealan.top` 的 80 端口 `server_name` 增加 `nas.codealan.top`，用于 ACME HTTP-01 与 HTTP 到 HTTPS 跳转：
+    ```nginx
+    server_name codealan.top www.codealan.top file.codealan.top nas.codealan.top;
+    ```
+  - 同一站点文件新增内部 HTTPS 后端。这里使用 `8446`，避免和已有博客 `8444`、文件站 `8445` 冲突：
+    ```nginx
+    server {
+        listen 8446 ssl;
+        listen [::]:8446 ssl;
+        server_name nas.codealan.top;
+
+        client_max_body_size 0;
+
+        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.cer;
+        ssl_certificate_key /etc/nginx/ssl/codealan.top/codealan.top.key;
+        ssl_protocols       TLSv1.2 TLSv1.3;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+
+        location / {
+            proxy_pass http://127.0.0.1:5666;
+            proxy_http_version 1.1;
+            proxy_request_buffering off;
+
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+        }
+    }
+    ```
+  - `/etc/nginx/stream.conf` 中增加 SNI 映射和 upstream：
+    ```nginx
+    map $ssl_preread_server_name $backend {
+        aws.amazon.com      sui;
+        codealan.top        web;
+        www.codealan.top    web;
+        file.codealan.top   file;
+        nas.codealan.top    nas;
+        default             web;
+    }
+
+    upstream nas {
+        server 127.0.0.1:8446;
+    }
+    ```
+  - 证书需包含 `nas.codealan.top`。如果当前证书不包含该域名，可重新签发/扩展证书后复制到现有路径：
+    ```bash
+    /home/ubuntu/.acme.sh/acme.sh --issue --force \
+      -d codealan.top -d www.codealan.top -d file.codealan.top -d nas.codealan.top \
+      -w /var/www/letsencrypt --server letsencrypt
+
+    sudo cp ~/.acme.sh/codealan.top_ecc/fullchain.cer /etc/nginx/ssl/codealan.top/fullchain.cer
+    sudo cp ~/.acme.sh/codealan.top_ecc/codealan.top.key /etc/nginx/ssl/codealan.top/codealan.top.key
+    ```
+  - 校验与重载：
+    ```bash
+    sudo nginx -t
+    sudo systemctl reload nginx
+    curl -k -I https://nas.codealan.top/
+    ```
 
 - 文件站点改为 Copyparty（2026-06-21）
   - 目标：将 `file.codealan.top` 后端从旧的 `file-transfer-go` 切换为 Docker 部署的 Copyparty，支持网页文件浏览、上传和在线播放/下载。

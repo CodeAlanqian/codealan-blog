@@ -72,6 +72,7 @@
   - 通过 `stream` 模块按 SNI 分流：  
     - `codealan.top` / `www.codealan.top` → 8444 (blog)。  
     - `file.codealan.top` → 8445 (Copyparty 文件站)。  
+    - `nas.codealan.top` → 8446 (NAS 反代到本机 5666)。
     - `aws.amazon.com` → 8443 (VLESS-Reality / sui)。  
 - 文件站点：  
   - `file.codealan.top` 使用 Docker 部署 Copyparty，Compose 文件为 `docker-compose.copyparty.yml`。  
@@ -81,6 +82,11 @@
   - 容器只绑定 `127.0.0.1:8888`，公网访问通过 Nginx `file.codealan.top` 反代进入。  
   - 反代模式下信任私网来源 `--xff-src lan`，用于正确识别 Nginx 传入的 `X-Forwarded-Proto: https`，避免登录时被 CORS/CSRF 检查拒绝。  
   - 上传性能：启用 `--turbo 2`，并将 Web 客户端并发上传设置为 `--u2j 6`、分片设置为 `--u2sz 8,16,64`。  
+- NAS 站点：
+  - 规划域名：`nas.codealan.top`。
+  - 规划后端：本机 `http://127.0.0.1:5666`。
+  - 在现有 443 SNI 分流结构下，建议新增内部 HTTPS 后端 `127.0.0.1:8446`，再由 Nginx stream 将 `nas.codealan.top` 分流到 8446。
+  - 证书需要包含 `nas.codealan.top`，否则浏览器会提示证书域名不匹配。
 
 ## 本地开发与构建
 
