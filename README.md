@@ -72,7 +72,7 @@
   - 通过 `stream` 模块按 SNI 分流：  
     - `codealan.top` / `www.codealan.top` → 8444 (blog)。  
     - `file.codealan.top` → 8445 (Copyparty 文件站)。  
-    - `nas.codealan.top` → 5667 (NAS 自带 HTTPS 服务)。
+    - `nas.codealan.top` → 5667 (frps HTTPS 虚拟主机入口)。
     - `aws.amazon.com` → 8443 (VLESS-Reality / sui)。  
 - 文件站点：  
   - `file.codealan.top` 使用 Docker 部署 Copyparty，Compose 文件为 `docker-compose.copyparty.yml`。  
@@ -84,9 +84,10 @@
   - 上传性能：启用 `--turbo 2`，并将 Web 客户端并发上传设置为 `--u2j 6`、分片设置为 `--u2sz 8,16,64`。  
 - NAS HTTPS 分流：
   - 规划域名：`nas.codealan.top`。
-  - 后端服务：本机 `https://127.0.0.1:5667`，该端口自身已经提供 HTTPS。
+  - 后端入口：本机 `127.0.0.1:5667`，对应 frps 的 HTTPS 虚拟主机监听端口（日志中为 `https service listen on 0.0.0.0:5667`）。
+  - frps 已注册 `fnos-https` 代理，host 为 `nas.codealan.top`。
   - 该域名不接入 Hugo 博客，也不复用博客后端；Nginx stream 只按 SNI 做 TCP 分流，不做 TLS 终止和 HTTP 反代。
-  - `nas.codealan.top` 的证书由 5667 端口上的 HTTPS 服务负责。
+  - `nas.codealan.top` 的 TLS 由 frps/frpc 后面的 HTTPS 服务链路负责，Nginx 不管理该域名证书。
 
 ## 本地开发与构建
 
