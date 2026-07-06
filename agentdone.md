@@ -83,18 +83,19 @@
     - 客户端 SNI 为 `aws.amazon.com` → 转发到 `127.0.0.1:8443`（sui）。  
     - SNI 为 `codealan.top` / `www.codealan.top` 或空/其他 → 转发到博客 8444。  
     - SNI 为 `file.codealan.top` → 转发到文件站点 8445（再反代到 `127.0.0.1:8888`）。  
-    - SNI 为 `nas.codealan.top` → 转发到 NAS 站点 8446（再反代到 `127.0.0.1:5666`）。
+    - SNI 为 `nas.codealan.top` → 转发到独立 HTTPS 反代入口 8446（再反代到 `127.0.0.1:5667`）。
   - 重启验证：`nginx -t` 通过，`curl -k https://127.0.0.1` 返回 200（博客），80 返回 301 到 HTTPS。  
   - 证书补充：若新增 `file.codealan.top`，需要重新签发或扩展证书包含该域名（acme.sh `--issue -d codealan.top -d www.codealan.top -d file.codealan.top`）。  
 
 使用说明（客户端侧）  
 - 博客：`https://codealan.top/` 正常访问。  
 - 文件站点：`https://file.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:8888`。  
-- NAS 站点：`https://nas.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:5666`。
+- NAS 反代：`https://nas.codealan.top/` 访问后由 Nginx 反代到 `http://127.0.0.1:5667`，不接入 Hugo 博客或博客后端。
 - VLESS-Reality：保持 SNI=`aws.amazon.com`，连接 `43.156.100.159:443`，将流量经 stream 分流到本地 `127.0.0.1:8443` 的 sui。  
 
-- NAS 站点 Nginx 配置建议（2026-07-06）
-  - 目标：将 `nas.codealan.top` 接入现有 443 SNI 分流，后端服务端口为本机 `5666`。
+- NAS 反代 Nginx 配置建议（2026-07-06）
+  - 目标：将 `nas.codealan.top` 作为独立 HTTPS 服务入口接入现有 443 SNI 分流，后端服务端口为本机 `5667`。
+  - 该域名不接入 Hugo 博客，也不走 `blog_server.py`；只是由 Nginx TLS 终止后反代到 `127.0.0.1:5667`。
   - 约定：按仓库规则，不直接写入 `/etc/nginx/...` 系统文件；以下为需要加入服务器 Nginx 配置的片段。
   - `/etc/nginx/sites-available/codealan.top` 的 80 端口 `server_name` 增加 `nas.codealan.top`，用于 ACME HTTP-01 与 HTTP 到 HTTPS 跳转：
     ```nginx
@@ -115,7 +116,7 @@
         ssl_ciphers         HIGH:!aNULL:!MD5;
 
         location / {
-            proxy_pass http://127.0.0.1:5666;
+            proxy_pass http://127.0.0.1:5667;
             proxy_http_version 1.1;
             proxy_request_buffering off;
 
