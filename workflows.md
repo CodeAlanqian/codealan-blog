@@ -150,3 +150,32 @@
   4. 自动 `git commit` + `git push origin master`。  
 - 若未来你调整了分支策略（例如使用 `dev`、`feature/*` 分支），可以在本文件追加新的约定，我会按最新约定执行。  
 
+---
+
+### 五、SSL 证书排查与续签经验
+
+处理“HTTPS 仍提示不安全”时，不只查看 acme.sh 的证书列表，必须依次核对以下三份证书的有效期、SAN 和颁发者：
+
+1. acme.sh 用户目录中的源证书：`~/.acme.sh/codealan.top_ecc/fullchain.cer`。
+2. Nginx 配置实际引用的安装证书：`/etc/nginx/ssl/codealan.top/fullchain.cer`。
+3. 公网 443 端口按各域名 SNI 实际返回的证书。
+
+若源证书较新、安装证书或公网证书仍旧，说明问题发生在“签发后部署”阶段。重点检查：
+
+- `Le_RealKeyPath`、`Le_RealFullChainPath` 和 `Le_ReloadCmd` 是否已登记。
+- 运行 acme.sh cron 的用户是否能覆盖目标证书文件；私钥权限保持 `0600`。
+- reload hook 是否有权限执行，例如 `sudo systemctl reload nginx`。
+- `~/.acme.sh/` 内是否残留 root 所有的备份文件，阻止用户级续签任务写入。
+
+修复后应完成完整闭环验证：
+
+```bash
+sudo nginx -t
+systemctl is-active nginx
+openssl s_client -connect codealan.top:443 -servername codealan.top \
+  -verify_return_error </dev/null 2>/dev/null | openssl x509 -noout -dates -ext subjectAltName
+curl --fail --location --output /dev/null \
+  --write-out 'HTTP %{http_code}, verify=%{ssl_verify_result}\n' https://codealan.top/
+```
+
+对 `codealan.top`、`www.codealan.top`、`file.codealan.top` 分别验证。应用返回 401/403 不等于 TLS 失败，应以证书校验结果为准。最后确认 `acme.sh --list` 中的下次续签时间，并把故障原因、证书有效期和自动部署修复记录到 `agentdone.md`。
