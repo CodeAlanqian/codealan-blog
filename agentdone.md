@@ -6,7 +6,15 @@
 
 - Nginx 与证书（初始 HTTPS）  
   - 新建并启用 `/etc/nginx/sites-available/codealan.top`：80 仅 ACME + 301 到 HTTPS；443 提供静态站，根 `/home/ubuntu/mypage/public`，独立日志。  
-  - 使用 acme.sh 申请 Let’s Encrypt（codealan.top/www.codealan.top，HTTP-01），证书与私钥位于 `/etc/nginx/ssl/codealan.top/fullchain.pem` 与 `/etc/nginx/ssl/codealan.top/privkey.pem`，并重载生效。  
+  - 使用 acme.sh 申请 Let’s Encrypt（codealan.top/www.codealan.top/file.codealan.top，HTTP-01），证书与私钥位于 `/etc/nginx/ssl/codealan.top/fullchain.cer` 与 `/etc/nginx/ssl/codealan.top/codealan.top.key`，并重载生效。
+  - 2026-07-18 续签修复：Nginx 当时仍加载 2026-06-19 已过期的证书。acme.sh 已在用户目录完成续签，但部署目标文件归 `root`，用户级 cron 无法覆盖。将实际部署文件交由运行 acme.sh 的 `ubuntu` 用户管理（私钥保持 `0600`），并重新登记安装与 reload hook：
+    ```bash
+    ~/.acme.sh/acme.sh --install-cert -d codealan.top --ecc \
+      --key-file /etc/nginx/ssl/codealan.top/codealan.top.key \
+      --fullchain-file /etc/nginx/ssl/codealan.top/fullchain.cer \
+      --reloadcmd "sudo systemctl reload nginx"
+    ```
+  - 已强制续签并自动部署新证书，有效期为 2026-07-18 至 2026-10-16；SAN 包含 `codealan.top`、`www.codealan.top`、`file.codealan.top`。三个公网入口的 TLS 校验结果均为 0；`file.codealan.top` 未登录返回 403 属于 Copyparty 权限策略，与证书无关。acme.sh 下次计划续签时间为 2026-09-15。
 
 - 443 端口复用与修改缘由  
   - 需求：保持 443 同时服务博客与 VLESS-Reality（sui），而不再占用额外端口。  
@@ -55,8 +63,8 @@
         listen [::]:8444 ssl http2;
         server_name codealan.top www.codealan.top;
         root /home/ubuntu/mypage/public;
-        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.pem;
-        ssl_certificate_key /etc/nginx/ssl/codealan.top/privkey.pem;
+        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.cer;
+        ssl_certificate_key /etc/nginx/ssl/codealan.top/codealan.top.key;
         location / { try_files $uri $uri/ =404; }
     }
     ```
@@ -66,8 +74,8 @@
         listen 8445 ssl http2;
         listen [::]:8445 ssl http2;
         server_name file.codealan.top;
-        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.pem;
-        ssl_certificate_key /etc/nginx/ssl/codealan.top/privkey.pem;
+        ssl_certificate     /etc/nginx/ssl/codealan.top/fullchain.cer;
+        ssl_certificate_key /etc/nginx/ssl/codealan.top/codealan.top.key;
 
         location / {
             proxy_pass http://127.0.0.1:8888;
